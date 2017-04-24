@@ -1,0 +1,11 @@
+*
+!.gitignore
+!src/
+!*.vhd
+!*.bdf
+!*.bsf
+!*.csv
+!*.mif
+!*.qpf
+!*.qpf
+!*.qsf
