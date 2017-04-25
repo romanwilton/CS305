@@ -82,8 +82,8 @@ applicable agreement for further details.
 	(port
 		(pt 240 80)
 		(output)
-		(text "RGB_out[2..0]" (rect 0 0 59 12)(font "Arial" ))
-		(text "RGB_out[2..0]" (rect 160 75 219 87)(font "Arial" ))
+		(text "RGB_out[11..0]" (rect 0 0 61 12)(font "Arial" ))
+		(text "RGB_out[11..0]" (rect 158 75 219 87)(font "Arial" ))
 		(line (pt 240 80)(pt 224 80)(line_width 3))
 	)
 	(drawing

@@ -10,7 +10,7 @@ ENTITY image_rom IS
 	PORT (
 		pixel_x, pixel_y, show_x, show_y	:	IN STD_LOGIC_VECTOR (9 DOWNTO 0);
 		clock								: 	IN STD_LOGIC;
-		RGB									:	OUT STD_LOGIC_VECTOR(2 downto 0)
+		RGB									:	OUT STD_LOGIC_VECTOR(11 downto 0)
 	);
 END image_rom;
 
@@ -77,6 +77,6 @@ BEGIN
 	end process;
 	
 	rom_out <= rom_data;
-	RGB <= rom_out(14) & rom_out(9) & rom_out(4);
+	RGB <= rom_out(14 downto 11) & rom_out(9 downto 6) & rom_out(4 downto 1);
 
 END SYN;

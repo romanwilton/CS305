@@ -6,7 +6,7 @@ entity draw_object is
 	port (
 		clock : IN std_logic;
 		pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
-		RGB_out	: OUT std_logic_vector(2 downto 0)
+		RGB_out	: OUT std_logic_vector(11 downto 0)
 	);
 end entity draw_object;
 
@@ -16,11 +16,11 @@ architecture arch of draw_object is
 		PORT (
 			pixel_x, pixel_y, show_x, show_y	:	IN STD_LOGIC_VECTOR (9 DOWNTO 0);
 			clock								: 	IN STD_LOGIC;
-			RGB									:	OUT STD_LOGIC_VECTOR(2 downto 0)
+			RGB									:	OUT STD_LOGIC_VECTOR(11 downto 0)
 		);
 	END COMPONENT image_rom;
 	
-	signal RGB : std_logic_vector(2 downto 0);
+	signal RGB : std_logic_vector(11 downto 0);
 
 begin
 
@@ -28,7 +28,7 @@ begin
 
 	process (pixel_row, pixel_col, x, y, RGB) is
 	begin
-		RGB_out <= "000";
+		RGB_out <= "000000000000";
 		if (x < pixel_col + 10) and (x > pixel_col - 10) then
 			if (y < pixel_row + 10) and (y > pixel_row - 10) then
 				RGB_out <= RGB;

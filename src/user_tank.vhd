@@ -8,7 +8,7 @@ entity user_tank is
 		clock : IN std_logic;
 		pixel_row, pixel_col, mouse_col : IN std_logic_vector(9 downto 0);
 		current_pos : OUT std_logic_vector(9 downto 0);
-		RGB_out	: OUT std_logic_vector(2 downto 0)
+		RGB_out	: OUT std_logic_vector(11 downto 0)
 	);
 end entity user_tank;
 
@@ -19,7 +19,7 @@ architecture arch of user_tank is
 		port (
 			clock : IN std_logic;
 			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
-			RGB_out	: OUT std_logic_vector(2 downto 0)
+			RGB_out	: OUT std_logic_vector(11 downto 0)
 		);
 	end component draw_object;
 begin
