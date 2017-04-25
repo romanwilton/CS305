@@ -27,16 +27,16 @@ architecture arch of bullet is
 begin
 	output_drawing : draw_object port map(pixel_row, pixel_col, x, y, RGB_out);
 
-clockDiv : process( clock )
-	variable counter : std_logic_vector(16 downto 0) := "00000000000000000";
-begin
-	if(rising_edge(clock)) then
-		if(counter = "11111111111111111") then
-			newClk <= NOT newClk;
+	clockDiv : process( clock )
+		variable counter : std_logic_vector(14 downto 0) := "000000000000000";
+	begin
+		if(rising_edge(clock)) then
+			if(counter = "111111111111111") then
+				newClk <= NOT newClk;
+			end if;
+			counter := counter +1;
 		end if;
-		counter := counter +1;
-	end if;
-end process ; -- clockDiv
+	end process ; -- clockDiv
 
 
 	clockDriven : process( newClk )
@@ -44,6 +44,7 @@ end process ; -- clockDiv
 		if(rising_edge(newClk)) then
 			if(move = '0') then
 				x <= new_pos;
+				y <= std_logic_vector(to_unsigned(400, 10));
 			elsif(move = '1') then
 				y <= y-1;
 			end if;
