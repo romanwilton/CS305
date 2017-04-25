@@ -39,13 +39,10 @@ begin
 	end process ; -- clockDiv
 
 
-	clockDriven : process( newClk )
+	position_logic : process (newClk, move, new_pos)
 	begin
 		if(rising_edge(newClk)) then
-			if(move = '0') then
-				x <= new_pos;
-				y <= std_logic_vector(to_unsigned(400, 10));
-			elsif(move = '1') then
+			if(move = '1') then
 				y <= y-1;
 			end if;
 
@@ -55,7 +52,13 @@ begin
 				off_screen <= '0';
 			end if;
 		end if;
-	end process ; -- clockDriven
 
+		if(move = '0') then
+			x <= new_pos;
+			y <= std_logic_vector(to_unsigned(400, 10));
+		end if;
+
+	end process ; -- position_logic
+	
 	current_pos <= "0000000000";
 end architecture arch;
