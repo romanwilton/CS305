@@ -9,7 +9,7 @@ entity bullet is
 		clock, move : IN std_logic;
 		pixel_row, pixel_col, new_pos : IN std_logic_vector(9 downto 0);
 		off_screen : OUT std_logic;
-		current_pos : OUT std_logic_vector(9 downto 0);
+		current_x_pos, current_y_pos : OUT std_logic_vector(9 downto 0);
 		RGB_out	: OUT std_logic_vector(2 downto 0)
 	);
 end entity bullet;
@@ -60,5 +60,6 @@ begin
 
 	end process ; -- position_logic
 	
-	current_pos <= "0000000000";
+	current_x_pos <= x;
+	current_y_pos <= y;
 end architecture arch;
