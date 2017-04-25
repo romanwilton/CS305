@@ -47,20 +47,9 @@ set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
 set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.2V
-set_global_assignment -name VHDL_FILE src/vga_sync.vhd
-set_global_assignment -name VHDL_FILE src/mouse.vhd
-set_global_assignment -name VHDL_FILE src/dec_7seg.vhd
-set_global_assignment -name VHDL_FILE src/clock_div.vhd
-set_global_assignment -name VHDL_FILE src/char_rom.vhd
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VHDL_FILE src/ai_tank.vhd
-set_global_assignment -name VHDL_FILE src/bullet.vhd
-set_global_assignment -name VHDL_FILE src/layer_control.vhd
-set_global_assignment -name VHDL_FILE src/user_tank.vhd
-set_global_assignment -name VHDL_FILE src/fsm.vhd
-set_global_assignment -name BDF_FILE src/cs305_project.bdf
 set_location_assignment PIN_K21 -to blue_out
 set_location_assignment PIN_G3 -to bt1
 set_location_assignment PIN_H2 -to bt2
@@ -87,4 +76,16 @@ set_location_assignment PIN_H13 -to seg0[3]
 set_location_assignment PIN_G12 -to seg0[4]
 set_location_assignment PIN_F12 -to seg0[5]
 set_location_assignment PIN_F13 -to seg0[6]
+set_global_assignment -name VHDL_FILE src/draw_object.vhd
+set_global_assignment -name VHDL_FILE src/vga_sync.vhd
+set_global_assignment -name VHDL_FILE src/mouse.vhd
+set_global_assignment -name VHDL_FILE src/dec_7seg.vhd
+set_global_assignment -name VHDL_FILE src/clock_div.vhd
+set_global_assignment -name VHDL_FILE src/char_rom.vhd
+set_global_assignment -name VHDL_FILE src/ai_tank.vhd
+set_global_assignment -name VHDL_FILE src/bullet.vhd
+set_global_assignment -name VHDL_FILE src/layer_control.vhd
+set_global_assignment -name VHDL_FILE src/user_tank.vhd
+set_global_assignment -name VHDL_FILE src/fsm.vhd
+set_global_assignment -name BDF_FILE src/cs305_project.bdf
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
