@@ -17,12 +17,13 @@ architecture arch of user_tank is
 	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(420, 10));
 	component draw_object is
 		port (
+			clock : IN std_logic;
 			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
 			RGB_out	: OUT std_logic_vector(2 downto 0)
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object port map(pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 	clockDriven : process( clock )
 	begin
 		if(rising_edge(clock)) then

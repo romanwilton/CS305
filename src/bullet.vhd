@@ -20,12 +20,13 @@ architecture arch of bullet is
 	signal newClk : std_logic := '0';
 	component draw_object is
 		port (
+			clock : IN std_logic;
 			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
 			RGB_out	: OUT std_logic_vector(2 downto 0)
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object port map(pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 clockDiv : process( clock )
 	variable counter : std_logic_vector(16 downto 0) := "00000000000000000";
