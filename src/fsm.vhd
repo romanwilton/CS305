@@ -5,7 +5,8 @@ use IEEE.std_logic_unsigned.all;
 entity fsm is
 	port (
 		clock, btn_1, left_btn, right_btn, off_screen, collision : IN std_logic;
-		bullet_shot, ai_reset : OUT std_logic
+		bullet_shot, ai_reset : OUT std_logic;
+		state_indicator : OUT std_logic_vector(3 downto 0)
 	);
 end entity fsm;
 
@@ -56,15 +57,19 @@ begin
 			when start =>
 				bullet_shot <= '0';
 				ai_reset <= '1';
+				state_indicator <= "0001";
 			when not_shot =>
 				bullet_shot <= '0';
 				ai_reset <= '0';
+				state_indicator <= "0010";
 			when shot =>
 				bullet_shot <= '1';
 				ai_reset <= '0';
+				state_indicator <= "0100";
 			when collided =>
 				bullet_shot <= '0';
 				ai_reset <= '1';
+				state_indicator <= "1000";
 		end case;
 	end process output_logic;
 
