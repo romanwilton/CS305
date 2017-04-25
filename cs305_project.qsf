@@ -76,12 +76,6 @@ set_location_assignment PIN_H13 -to seg0[3]
 set_location_assignment PIN_G12 -to seg0[4]
 set_location_assignment PIN_F12 -to seg0[5]
 set_location_assignment PIN_F13 -to seg0[6]
-set_location_assignment PIN_B1 -to btn_1
-set_location_assignment PIN_J1 -to left_btn
-set_location_assignment PIN_C1 -to state_ind[3]
-set_location_assignment PIN_E1 -to state_ind[2]
-set_location_assignment PIN_F2 -to state_ind[1]
-set_location_assignment PIN_H1 -to state_ind[0]
 set_global_assignment -name VHDL_FILE src/image_rom.vhd
 set_global_assignment -name VHDL_FILE src/draw_object.vhd
 set_global_assignment -name VHDL_FILE src/vga_sync.vhd
