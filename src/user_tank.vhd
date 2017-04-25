@@ -28,6 +28,7 @@ begin
 	begin
 		if(rising_edge(clock)) then
 			x <= mouse_col;
+			current_pos <= x;
 		end if;
 	end process ; -- clockDriven
 end architecture arch;

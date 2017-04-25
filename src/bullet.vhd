@@ -9,7 +9,7 @@ entity bullet is
 		clock, move : IN std_logic;
 		pixel_row, pixel_col, new_pos : IN std_logic_vector(9 downto 0);
 		off_screen : OUT std_logic;
-		current_pos : OUT std_logic_vector(9 downto 0);
+		current_x_pos, current_y_pos : OUT std_logic_vector(9 downto 0);
 		RGB_out	: OUT std_logic_vector(2 downto 0)
 	);
 end entity bullet;
@@ -28,24 +28,22 @@ architecture arch of bullet is
 begin
 	output_drawing : draw_object port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
-clockDiv : process( clock )
-	variable counter : std_logic_vector(16 downto 0) := "00000000000000000";
-begin
-	if(rising_edge(clock)) then
-		if(counter = "11111111111111111") then
-			newClk <= NOT newClk;
+	clockDiv : process( clock )
+		variable counter : std_logic_vector(14 downto 0) := "000000000000000";
+	begin
+		if(rising_edge(clock)) then
+			if(counter = "111111111111111") then
+				newClk <= NOT newClk;
+			end if;
+			counter := counter +1;
 		end if;
-		counter := counter +1;
-	end if;
-end process ; -- clockDiv
+	end process ; -- clockDiv
 
 
-	clockDriven : process( newClk )
+	position_logic : process (newClk, move, new_pos)
 	begin
 		if(rising_edge(newClk)) then
-			if(move = '0') then
-				x <= new_pos;
-			elsif(move = '1') then
+			if(move = '1') then
 				y <= y-1;
 			end if;
 
@@ -55,7 +53,14 @@ end process ; -- clockDiv
 				off_screen <= '0';
 			end if;
 		end if;
-	end process ; -- clockDriven
 
-	current_pos <= "0000000000";
+		if(move = '0') then
+			x <= new_pos;
+			y <= std_logic_vector(to_unsigned(400, 10));
+		end if;
+
+	end process ; -- position_logic
+	
+	current_x_pos <= x;
+	current_y_pos <= y;
 end architecture arch;
