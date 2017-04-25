@@ -96,4 +96,5 @@ set_location_assignment PIN_E1 -to state_ind[2]
 set_location_assignment PIN_F2 -to state_ind[1]
 set_location_assignment PIN_H1 -to state_ind[0]
 set_global_assignment -name VHDL_FILE src/counter.vhd
+set_global_assignment -name BDF_FILE src/rand_gen.bdf
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

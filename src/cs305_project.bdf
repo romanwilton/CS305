@@ -19,18 +19,6 @@ Altera or its authorized distributors.  Please refer to the
 applicable agreement for further details.
 */
 (header "graphic" (version "1.4"))
-(global
-	(rect 672 1032 960 1072)
-	(constant)
-	(text "CONSTANT" (rect 3 -1 142 23)(font "Arial" (font_size 8)))
-	(text " NAME" (rect 107 0 181 22)(font "Arial" ))
-	(text "rand_pos[9..0]" (rect 4 16 163 40)(font "Arial" (font_size 8)))
-	(text " VALUE" (rect 139 0 225 22)(font "Arial" ))
-	(text "B\"0101000000\"" (rect 140 16 281 40)(font "Arial" (font_size 8)))
-	(drawing
-		(line (pt 138 40)(pt 138 0))
-	)
-)
 (pin
 	(input)
 	(rect 8 560 184 576)
@@ -785,6 +773,35 @@ applicable agreement for further details.
 		(rectangle (rect 16 16 200 64))
 	)
 )
+(symbol
+	(rect -8 416 264 512)
+	(text "rand_gen" (rect 5 0 107 24)(font "Arial" (font_size 8)))
+	(text "inst11" (rect 8 70 68 92)(font "Arial" ))
+	(port
+		(pt 0 32)
+		(input)
+		(text "clock" (rect 0 0 56 24)(font "Arial" (font_size 8)))
+		(text "clock" (rect 21 27 77 51)(font "Arial" (font_size 8)))
+		(line (pt 0 32)(pt 16 32))
+	)
+	(port
+		(pt 0 48)
+		(input)
+		(text "reset" (rect 0 0 56 24)(font "Arial" (font_size 8)))
+		(text "reset" (rect 21 43 77 67)(font "Arial" (font_size 8)))
+		(line (pt 0 48)(pt 16 48))
+	)
+	(port
+		(pt 272 32)
+		(output)
+		(text "rand_num[9..0]" (rect 0 0 164 24)(font "Arial" (font_size 8)))
+		(text "rand_num[9..0]" (rect 87 27 251 51)(font "Arial" (font_size 8)))
+		(line (pt 272 32)(pt 256 32)(line_width 3))
+	)
+	(drawing
+		(rectangle (rect 16 16 256 80))
+	)
+)
 (connector
 	(text "clock" (rect 354 544 405 566)(font "Arial" ))
 	(pt 352 568)
@@ -992,7 +1009,7 @@ applicable agreement for further details.
 	(pt 1664 664)
 )
 (connector
-	(text "rand_pos[9..0]" (rect 578 888 721 910)(font "Arial" ))
+	(text "rand_pos[9..0]" (rect 570 888 713 910)(font "Arial" ))
 	(pt 784 888)
 	(pt 640 888)
 	(bus)
@@ -1142,6 +1159,17 @@ applicable agreement for further details.
 	(pt 1880 936)
 	(pt 1992 936)
 	(bus)
+)
+(connector
+	(text "rand_pos[9..0]" (rect 274 424 417 446)(font "Arial" ))
+	(pt 264 448)
+	(pt 408 448)
+	(bus)
+)
+(connector
+	(text "clock" (rect -102 424 -51 446)(font "Arial" ))
+	(pt -8 448)
+	(pt -104 448)
 )
 (junction (pt 64 840))
 (junction (pt 168 856))
