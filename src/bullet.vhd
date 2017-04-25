@@ -1,6 +1,8 @@
 LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
+use IEEE.numeric_std.all;
+
 
 entity bullet is
 	port (
@@ -11,3 +13,34 @@ entity bullet is
 		RGB_out	: OUT std_logic_vector(2 downto 0)
 	);
 end entity bullet;
+
+architecture arch of bullet is
+	signal x : std_logic_vector(9 downto 0);
+	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(400, 10));
+	component draw_object is
+		port (
+			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
+			RGB_out	: OUT std_logic_vector(2 downto 0)
+		);
+	end component draw_object;
+begin
+	output_drawing : draw_object port map(pixel_row, pixel_col, x, y, RGB_out);
+	clockDriven : process( clock )
+	begin
+		if(rising_edge(clock)) then
+			if(move = '0') then
+				x <= new_pos;
+			elsif(move = '1') then
+				y <= y-1;
+			end if;
+
+			if (y = "0000000000") then
+				off_screen <= '1';
+			else
+				off_screen <= '0';
+			end if;
+		end if;
+	end process ; -- clockDriven
+
+	current_pos <= "0000000000";
+end architecture arch;
