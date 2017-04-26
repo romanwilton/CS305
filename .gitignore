@@ -1,6 +1,7 @@
 *
 !.gitignore
 !src/
+!images/
 !*.vhd
 !*.bdf
 !*.bsf
@@ -9,3 +10,5 @@
 !*.qpf
 !*.qpf
 !*.qsf
+!*.png
+!*.py

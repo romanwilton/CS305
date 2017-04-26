@@ -50,7 +50,7 @@ BEGIN
 		address_aclr_a => "NONE",
 		clock_enable_input_a => "BYPASS",
 		clock_enable_output_a => "BYPASS",
-		init_file => "sprite.mif",
+		init_file => "images/sprite.mif",
 		intended_device_family => "Cyclone III",
 		lpm_hint => "ENABLE_RUNTIME_MOD=NO",
 		lpm_type => "altsyncram",
@@ -77,6 +77,8 @@ BEGIN
 	end process;
 	
 	rom_out <= rom_data;
-	RGB <= rom_out(14 downto 11) & rom_out(9 downto 6) & rom_out(4 downto 1);
+	RGB <= 
+		rom_out(14 downto 11) & rom_out(9 downto 6) & rom_out(4 downto 1) when rom_out(15) = '1' 
+		else "000000000000";
 
 END SYN;
