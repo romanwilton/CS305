@@ -16,7 +16,7 @@ architecture arch of layer_control is
 begin
 	process (layers) is
 	begin
-		RGB_out <= "000000000000";
+		RGB_out <= X"FA4";
 		for i in NUM_INPUTS downto 1 loop
 			if layers((12*i -1) downto 12*(i-1)) /= "000000000000" then
 				RGB_out <= layers((12*i -1) downto 12*(i-1));
