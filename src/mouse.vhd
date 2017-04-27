@@ -138,7 +138,7 @@ BEGIN
 END PROCESS;
 
 	--This process sends serial data going to the mouse
-SEND_UART: PROCESS (send_data, Mouse_clK_filter)
+SEND_UART: PROCESS (send_data, Mouse_clK_filter, charout)
 BEGIN
 IF SEND_DATA = '1' THEN
 	OUTCNT <= "0000";

@@ -23,7 +23,7 @@ begin
 		end if;
 	end process progress_state;
 
-	next_state_logic : process (btn_1, left_btn, right_btn, off_screen, collision) is
+	next_state_logic : process (state, btn_1, left_btn, right_btn, off_screen, collision) is
 	begin
 		case state is
 			when start =>
