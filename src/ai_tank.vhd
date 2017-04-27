@@ -28,7 +28,7 @@ architecture arch of ai_tank is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object generic map ("images/sprite.mif", 24, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object generic map ("images/tank2.mif", 80, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 	movement : process( clock )
 		variable counter : std_logic_vector(17 downto 0) := "000000000000000000";

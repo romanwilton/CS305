@@ -27,7 +27,7 @@ architecture arch of user_tank is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object generic map ("images/sprite.mif", 24, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object generic map ("images/tank2.mif", 80, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 	clockDriven : process( clock )
 	begin
 		if(rising_edge(clock)) then

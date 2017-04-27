@@ -77,7 +77,7 @@ BEGIN
 	begin
 		x := unsigned(show_x) + width/2 - unsigned(pixel_x);
 		y := unsigned(show_y) + height/2 - unsigned(pixel_y);
-		rom_address <= std_logic_vector((x + y(7 downto 0)*to_unsigned(width, 8)));
+		rom_address <= std_logic_vector((y + x(7 downto 0)*to_unsigned(height, 8)));
 	end process;
 	
 	rom_out <= rom_data;
