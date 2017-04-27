@@ -17,6 +17,10 @@ architecture arch of ai_tank is
 	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
 	signal moveDir : std_logic := '0';
 	component draw_object is
+		generic (
+			image_path : string;
+			width, height : integer
+		);
 		port (
 			clock : IN std_logic;
 			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
@@ -24,7 +28,7 @@ architecture arch of ai_tank is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object generic map ("images/sprite.mif", 24, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 	movement : process( clock )
 		variable counter : std_logic_vector(17 downto 0) := "000000000000000000";
@@ -52,7 +56,7 @@ begin
 		end if;
 	end process ; -- movement
 
-	collisions : process( bullet_y_pos, bullet_x_pos )
+	collisions : process (bullet_y_pos, bullet_x_pos, x) is
 	begin
 		if(bullet_y_pos < std_logic_vector(to_unsigned(90, 10)) AND bullet_y_pos > std_logic_vector(to_unsigned(70, 10))) then
 			if(bullet_x_pos < x+10 AND bullet_x_pos > x-10) then

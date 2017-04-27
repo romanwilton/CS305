@@ -19,6 +19,10 @@ architecture arch of bullet is
 	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(400, 10));
 	signal newClk : std_logic := '0';
 	component draw_object is
+		generic (
+			image_path : string;
+			width, height : integer
+		);
 		port (
 			clock : IN std_logic;
 			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
@@ -26,7 +30,7 @@ architecture arch of bullet is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object generic map ("images/sprite.mif", 24, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 	clockDiv : process( clock )
 		variable counter : std_logic_vector(14 downto 0) := "000000000000000";

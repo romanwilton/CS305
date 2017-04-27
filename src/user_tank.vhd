@@ -16,6 +16,10 @@ architecture arch of user_tank is
 	signal x : std_logic_vector(9 downto 0);
 	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(420, 10));
 	component draw_object is
+		generic (
+			image_path : string;
+			width, height : integer
+		);
 		port (
 			clock : IN std_logic;
 			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
@@ -23,7 +27,7 @@ architecture arch of user_tank is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object generic map ("images/sprite.mif", 24, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 	clockDriven : process( clock )
 	begin
 		if(rising_edge(clock)) then

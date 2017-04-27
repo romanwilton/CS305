@@ -7,6 +7,10 @@ LIBRARY altera_mf;
 USE altera_mf.all;
 
 ENTITY image_rom IS
+	generic (
+		image_path : string;
+		width, height : integer
+	);
 	PORT (
 		pixel_x, pixel_y, show_x, show_y	:	IN STD_LOGIC_VECTOR (9 DOWNTO 0);
 		clock								: 	IN STD_LOGIC;
@@ -50,11 +54,11 @@ BEGIN
 		address_aclr_a => "NONE",
 		clock_enable_input_a => "BYPASS",
 		clock_enable_output_a => "BYPASS",
-		init_file => "images/sprite.mif",
+		init_file => image_path,
 		intended_device_family => "Cyclone III",
 		lpm_hint => "ENABLE_RUNTIME_MOD=NO",
 		lpm_type => "altsyncram",
-		numwords_a => 576,
+		numwords_a => width*height,
 		operation_mode => "ROM",
 		outdata_aclr_a => "NONE",
 		outdata_reg_a => "UNREGISTERED",
@@ -71,9 +75,9 @@ BEGIN
 	process (pixel_x, pixel_y, show_x, show_y) is
 		variable x, y : unsigned(9 downto 0);
 	begin
-		x := unsigned(pixel_x) + 12 - unsigned(show_x);
-		y := unsigned(pixel_y) + 12 - unsigned(show_y);
-		rom_address <= "0" & std_logic_vector((x + y*to_unsigned(24, 5)));
+		x := unsigned(show_x) + width/2 - unsigned(pixel_x);
+		y := unsigned(show_y) + height/2 - unsigned(pixel_y);
+		rom_address <= std_logic_vector((x + y(7 downto 0)*to_unsigned(width, 8)));
 	end process;
 	
 	rom_out <= rom_data;
