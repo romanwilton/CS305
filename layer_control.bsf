@@ -26,8 +26,8 @@ applicable agreement for further details.
 	(port
 		(pt 0 32)
 		(input)
-		(text "layers[12*num_inputs-1..0]" (rect 0 0 100 12)(font "Arial" ))
-		(text "layers[12*num_inputs-1..0]" (rect 21 27 121 39)(font "Arial" ))
+		(text "layers[16*num_inputs-1..0]" (rect 0 0 100 12)(font "Arial" ))
+		(text "layers[16*num_inputs-1..0]" (rect 21 27 121 39)(font "Arial" ))
 		(line (pt 0 32)(pt 16 32)(line_width 3))
 	)
 	(port

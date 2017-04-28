@@ -8,7 +8,7 @@ entity ai_tank is
 		clock, reset : IN std_logic;
 		pixel_row, pixel_col, new_pos, bullet_x_pos, bullet_y_pos : IN std_logic_vector(9 downto 0);
 		collision	: OUT std_logic;
-		RGB_out	: OUT std_logic_vector(11 downto 0)
+		RGB_out	: OUT std_logic_vector(15 downto 0)
 	);
 end entity ai_tank;
 
@@ -24,7 +24,7 @@ architecture arch of ai_tank is
 		port (
 			clock : IN std_logic;
 			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
-			RGB_out	: OUT std_logic_vector(11 downto 0)
+			RGB_out	: OUT std_logic_vector(15 downto 0)
 		);
 	end component draw_object;
 begin

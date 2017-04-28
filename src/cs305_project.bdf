@@ -454,8 +454,8 @@ applicable agreement for further details.
 	(port
 		(pt 232 48)
 		(output)
-		(text "RGB_out[11..0]" (rect 0 0 76 12)(font "Arial" ))
-		(text "RGB_out[11..0]" (rect 147 43 211 55)(font "Arial" ))
+		(text "RGB_out[15..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "RGB_out[15..0]" (rect 147 43 211 55)(font "Arial" ))
 		(line (pt 232 48)(pt 216 48)(line_width 3))
 	)
 	(drawing
@@ -525,8 +525,8 @@ applicable agreement for further details.
 	(port
 		(pt 240 80)
 		(output)
-		(text "RGB_out[11..0]" (rect 0 0 76 12)(font "Arial" ))
-		(text "RGB_out[11..0]" (rect 155 75 219 87)(font "Arial" ))
+		(text "RGB_out[15..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "RGB_out[15..0]" (rect 155 75 219 87)(font "Arial" ))
 		(line (pt 240 80)(pt 224 80)(line_width 3))
 	)
 	(drawing
@@ -640,8 +640,8 @@ applicable agreement for further details.
 	(port
 		(pt 0 32)
 		(input)
-		(text "layers[12*num_inputs-1..0]" (rect 0 0 133 12)(font "Arial" ))
-		(text "layers[12*num_inputs-1..0]" (rect 21 27 154 39)(font "Arial" ))
+		(text "layers[16*num_inputs-1..0]" (rect 0 0 133 12)(font "Arial" ))
+		(text "layers[16*num_inputs-1..0]" (rect 21 27 154 39)(font "Arial" ))
 		(line (pt 0 32)(pt 16 32)(line_width 3))
 	)
 	(port
@@ -703,8 +703,8 @@ applicable agreement for further details.
 	(port
 		(pt 232 48)
 		(output)
-		(text "RGB_out[11..0]" (rect 0 0 76 12)(font "Arial" ))
-		(text "RGB_out[11..0]" (rect 147 43 211 55)(font "Arial" ))
+		(text "RGB_out[15..0]" (rect 0 0 76 12)(font "Arial" ))
+		(text "RGB_out[15..0]" (rect 147 43 211 55)(font "Arial" ))
 		(line (pt 232 48)(pt 216 48)(line_width 3))
 	)
 	(drawing
@@ -751,7 +751,7 @@ applicable agreement for further details.
 		(pt 216 32)
 		(output)
 		(text "seven_seg[6..0]" (rect 0 0 80 12)(font "Arial" ))
-		(text "seven_seg[6..0]" (rect 128 27 208 39)(font "Arial" ))
+		(text "seven_seg[6..0]" (rect 128 27 195 39)(font "Arial" ))
 		(line (pt 216 32)(pt 200 32)(line_width 3))
 	)
 	(drawing
@@ -773,7 +773,7 @@ applicable agreement for further details.
 		(pt 152 32)
 		(output)
 		(text "Q[3..0]" (rect 0 0 34 12)(font "Arial" ))
-		(text "Q[3..0]" (rect 103 27 137 39)(font "Arial" ))
+		(text "Q[3..0]" (rect 103 27 131 39)(font "Arial" ))
 		(line (pt 152 32)(pt 136 32)(line_width 3))
 	)
 	(drawing
@@ -1084,12 +1084,6 @@ applicable agreement for further details.
 	(bus)
 )
 (connector
-	(text "layers[35..0]" (rect 1338 520 1400 532)(font "Arial" ))
-	(pt 1440 544)
-	(pt 1328 544)
-	(bus)
-)
-(connector
 	(pt 1024 624)
 	(pt 1040 624)
 	(bus)
@@ -1132,24 +1126,6 @@ applicable agreement for further details.
 (connector
 	(pt 456 872)
 	(pt 504 872)
-	(bus)
-)
-(connector
-	(text "layers[35..24]" (rect 1106 424 1174 436)(font "Arial" ))
-	(pt 1008 448)
-	(pt 1144 448)
-	(bus)
-)
-(connector
-	(text "layers[23..12]" (rect 1114 664 1182 676)(font "Arial" ))
-	(pt 1024 656)
-	(pt 1144 656)
-	(bus)
-)
-(connector
-	(text "layers[11..0]" (rect 1074 848 1136 860)(font "Arial" ))
-	(pt 1016 840)
-	(pt 1104 840)
 	(bus)
 )
 (connector
@@ -1246,6 +1222,30 @@ applicable agreement for further details.
 	(text "<<__$DEF_ALIAS1030>>" (rect 578 888 701 900)(font "Arial" )(invisible))
 	(pt 784 888)
 	(pt 696 888)
+	(bus)
+)
+(connector
+	(text "layers[47..0]" (rect 1338 520 1400 532)(font "Arial" ))
+	(pt 1440 544)
+	(pt 1328 544)
+	(bus)
+)
+(connector
+	(text "layers[15..0]" (rect 1074 848 1136 860)(font "Arial" ))
+	(pt 1016 840)
+	(pt 1104 840)
+	(bus)
+)
+(connector
+	(text "layers[47..32]" (rect 1106 424 1174 436)(font "Arial" ))
+	(pt 1008 448)
+	(pt 1144 448)
+	(bus)
+)
+(connector
+	(text "layers[31..16]" (rect 1114 664 1182 676)(font "Arial" ))
+	(pt 1024 656)
+	(pt 1144 656)
 	(bus)
 )
 (junction (pt 64 840))
