@@ -5,7 +5,7 @@ use IEEE.numeric_std.all;
 
 entity ai_tank is
 	port (
-		clock, reset : IN std_logic;
+		clock, reset, hold : IN std_logic;
 		pixel_row, pixel_col, new_pos, bullet_x_pos, bullet_y_pos : IN std_logic_vector(9 downto 0);
 		collision	: OUT std_logic;
 		RGB_out	: OUT std_logic_vector(15 downto 0)
@@ -40,7 +40,7 @@ begin
 
 			counter := counter +1;
 
-			if(counter = "111111111111111111") then
+			if(counter = "111111111111111111" AND hold = '0') then
 				if(x = std_logic_vector(to_unsigned(640, 10))) then
 					moveDir <= '1';
 				elsif(x = "0000000000") then

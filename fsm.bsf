@@ -82,16 +82,23 @@ applicable agreement for further details.
 	(port
 		(pt 224 64)
 		(output)
-		(text "increase_score" (rect 0 0 61 12)(font "Arial" ))
-		(text "increase_score" (rect 142 59 203 71)(font "Arial" ))
+		(text "ai_hold" (rect 0 0 27 12)(font "Arial" ))
+		(text "ai_hold" (rect 176 59 203 71)(font "Arial" ))
 		(line (pt 224 64)(pt 208 64)(line_width 1))
 	)
 	(port
 		(pt 224 80)
 		(output)
+		(text "increase_score" (rect 0 0 61 12)(font "Arial" ))
+		(text "increase_score" (rect 142 75 203 87)(font "Arial" ))
+		(line (pt 224 80)(pt 208 80)(line_width 1))
+	)
+	(port
+		(pt 224 96)
+		(output)
 		(text "state_indicator[3..0]" (rect 0 0 76 12)(font "Arial" ))
-		(text "state_indicator[3..0]" (rect 127 75 203 87)(font "Arial" ))
-		(line (pt 224 80)(pt 208 80)(line_width 3))
+		(text "state_indicator[3..0]" (rect 127 91 203 103)(font "Arial" ))
+		(line (pt 224 96)(pt 208 96)(line_width 3))
 	)
 	(drawing
 		(rectangle (rect 16 16 208 128)(line_width 1))
