@@ -1,6 +1,7 @@
 LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
+use work.util.all;
 
 entity cs305_project is
 	port (
@@ -15,6 +16,8 @@ entity cs305_project is
 end entity cs305_project;
 
 architecture arch of cs305_project is
+
+	constant NUM_LAYERS : integer := 4;
 
 --Component description begins
 
@@ -62,7 +65,7 @@ architecture arch of cs305_project is
 			NUM_INPUTS : integer := 3
 		);
 		port (
-			layers : IN std_logic_vector((16*NUM_INPUTS -1) downto 0);
+			layers : IN pixel((NUM_INPUTS - 1) downto 0);
 			RGB_out	: OUT std_logic_vector(11 downto 0)
 		);
 	end component layer_control;
@@ -130,7 +133,7 @@ architecture arch of cs305_project is
 	signal current_score_1, current_score_2 : std_logic_vector(3 downto 0);
 	signal pixel_row, pixel_col : std_logic_vector(9 downto 0);
 	signal bullet_y_pos, bullet_x_pos : std_logic_vector(9 downto 0);
-	signal layers : std_logic_vector(63 downto 0);
+	signal layers : pixel(NUM_LAYERS-1 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
 
 begin
@@ -141,12 +144,12 @@ begin
 	SevenSegDecoder1 : dec_7seg port map(current_score_1, seg0);
 	SevenSegDecoder2 : dec_7seg port map(current_score_2, seg1);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
-	UserTank : user_tank port map(divided_clk, pixel_row, pixel_col, mouse_x_location, user_location, layers(47 downto 32));
-	UserBullet : bullet port map(divided_clk, bullet_shot, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(31 downto 16));
-	AiTank : ai_tank port map(divided_clk, ai_reset, ai_hold, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision, layers(15 downto 0));
-	LayerControl : layer_control generic map (4) port map(layers, RGB_out);
+	UserTank : user_tank port map(divided_clk, pixel_row, pixel_col, mouse_x_location, user_location, layers(2));
+	UserBullet : bullet port map(divided_clk, bullet_shot, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(1));
+	AiTank : ai_tank port map(divided_clk, ai_reset, ai_hold, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision, layers(0));
+	LayerControl : layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
 	DisplayControl : VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, pixel_row, pixel_col);
-	DrawScore : draw_score port map (divided_clk, current_score_1, current_score_2, pixel_row, pixel_col, layers(63 downto 48));
+	DrawScore : draw_score port map (divided_clk, current_score_1, current_score_2, pixel_row, pixel_col, layers(3));
 	
 	btn_1 <= NOT bt2;
 	left_btn <= left_button;
