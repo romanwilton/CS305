@@ -10,7 +10,7 @@ entity cs305_project is
 		horiz_sync_out, vert_sync_out : OUT std_logic;
 		state_ind : OUT std_logic_vector(3 downto 0);
 		red_out, green_out, blue_out : OUT std_logic_vector(3 downto 0);
-		seg0 : OUT std_logic_vector(6 downto 0)
+		seg0, seg1 : OUT std_logic_vector(6 downto 0)
 	);
 end entity cs305_project;
 
@@ -36,7 +36,7 @@ architecture arch of cs305_project is
 	component counter is
 		port (
 			count : IN std_logic;
-			Q	: OUT std_logic_vector(3 downto 0)
+			Q_1, Q_2 : OUT std_logic_vector(3 downto 0)
 		);
 	end component counter;
 
@@ -118,7 +118,7 @@ architecture arch of cs305_project is
 
 	signal divided_clk, left_button, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score : std_logic;
 	signal mouse_x_location, mouse_y_location, random_pos, user_location : std_logic_vector(9 downto 0);
-	signal current_score : std_logic_vector(3 downto 0);
+	signal current_score_1, current_score_2 : std_logic_vector(3 downto 0);
 	signal pixel_row, pixel_col : std_logic_vector(9 downto 0);
 	signal bullet_y_pos, bullet_x_pos : std_logic_vector(9 downto 0);
 	signal layers : std_logic_vector(47 downto 0);
@@ -127,14 +127,18 @@ architecture arch of cs305_project is
 begin
 	ClockDivider : clock_div port map(clk, divided_clk);
 	MouseController : MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, mouse_y_location, mouse_x_location);
-	StateMachine : fsm port map(divided_clk, bt2, left_button, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score, state_ind);
-	ScoreCounter : counter port map(increase_score, current_score);
-	SevenSegDecoder : dec_7seg port map(current_score, seg0);
+	StateMachine : fsm port map(divided_clk, NOT bt2, left_button, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score, state_ind);
+	ScoreCounter : counter port map(increase_score, current_score_1, current_score_2);
+	SevenSegDecoder1 : dec_7seg port map(current_score_1, seg0);
+	SevenSegDecoder2 : dec_7seg port map(current_score_2, seg1);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	UserTank : user_tank port map(divided_clk, pixel_row, pixel_col, mouse_x_location, user_location, layers(47 downto 32));
 	UserBullet : bullet port map(divided_clk, bullet_shot, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(31 downto 16));
 	AiTank : ai_tank port map(divided_clk, ai_reset, ai_hold, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision, layers(15 downto 0));
 	LayerControl : layer_control port map(layers, RGB_out);
 	DisplayControl : VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, pixel_row, pixel_col);
+
+	btn_1 <= NOT bt2;
+	left_btn <= left_button;
 
 end architecture arch;

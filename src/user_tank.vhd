@@ -14,7 +14,7 @@ end entity user_tank;
 
 architecture arch of user_tank is
 	signal x : std_logic_vector(9 downto 0);
-	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(420, 10));
+	signal y : std_logic_vector(9 downto 0);
 	component draw_object is
 		generic (
 			image_path : string;
@@ -27,6 +27,7 @@ architecture arch of user_tank is
 		);
 	end component draw_object;
 begin
+	y <= std_logic_vector(to_unsigned(420, 10));
 	output_drawing : draw_object generic map ("images/tank2.mif", 80, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 	clockDriven : process( clock )
 	begin
