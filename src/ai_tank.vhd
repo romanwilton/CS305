@@ -13,8 +13,8 @@ entity ai_tank is
 end entity ai_tank;
 
 architecture arch of ai_tank is
-	constant width : natural := 80;
-	constant height : natural := 24;
+	constant width : natural := 50;
+	constant height : natural := 54;
 
 	signal x : std_logic_vector(9 downto 0);
 	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
@@ -31,7 +31,7 @@ architecture arch of ai_tank is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object generic map ("images/tank2.mif", width, height) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object generic map ("images/enemyTank.mif", width, height) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 	movement : process( clock )
 		variable counter : std_logic_vector(17 downto 0) := "000000000000000000";

@@ -1,0 +1,60 @@
+
+-- MADE BY T. Dendale
+-- WIDTH =  6
+-- HEIGHT = 8
+
+DEPTH = 48;
+WIDTH = 16;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+CONTENT
+BEGIN
+0:	0000;
+1:	cd65;
+2:	cd65;
+3:	cd65;
+4:	cd65;
+5:	cd65;
+6:	cd65;
+7:	cd65;
+8:	cd65;
+9:	cd65;
+a:	ddc6;
+b:	ddc6;
+c:	ddc6;
+d:	ddc6;
+e:	ddc6;
+f:	cd65;
+10:	cd65;
+11:	ddc6;
+12:	ddc6;
+13:	ddc6;
+14:	ddc6;
+15:	ddc6;
+16:	ddc6;
+17:	cd65;
+18:	cd65;
+19:	ddc6;
+1a:	ddc6;
+1b:	ddc6;
+1c:	ddc6;
+1d:	ddc6;
+1e:	ddc6;
+1f:	cd65;
+20:	cd65;
+21:	cd65;
+22:	e5e7;
+23:	e5e7;
+24:	e5e7;
+25:	e5e7;
+26:	e5e7;
+27:	cd65;
+28:	0000;
+29:	cd65;
+2a:	cd65;
+2b:	cd65;
+2c:	cd65;
+2d:	cd65;
+2e:	cd65;
+2f:	cd65;
+END;

@@ -16,8 +16,9 @@ end entity bullet;
 
 architecture arch of bullet is
 	signal x : std_logic_vector(9 downto 0);
-	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(400, 10));
+	signal y : std_logic_vector(9 downto 0);
 	signal newClk : std_logic := '0';
+	constant default_y : integer := 427;
 	component draw_object is
 		generic (
 			image_path : string;
@@ -30,7 +31,7 @@ architecture arch of bullet is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object generic map ("images/sprite.mif", 24, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object generic map ("images/bullet.mif", 6, 8) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 	clockDiv : process( clock )
 		variable counter : std_logic_vector(14 downto 0) := "000000000000000";
@@ -59,8 +60,8 @@ begin
 		end if;
 
 		if(move = '0') then
-			x <= new_pos;
-			y <= std_logic_vector(to_unsigned(400, 10));
+			x <= new_pos - 1;
+			y <= std_logic_vector(to_unsigned(default_y, 10));
 		end if;
 
 	end process ; -- position_logic
