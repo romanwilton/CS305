@@ -113,6 +113,15 @@ architecture arch of cs305_project is
 			RGB_out	: OUT std_logic_vector(15 downto 0)
 		);
 	end component bullet;
+	
+	component draw_score is
+		port(
+			clk : in std_logic;
+			digit1, digit2 : in std_logic_vector(3 downto 0);
+			pixel_row, pixel_col : in std_logic_vector(9 downto 0);
+			colour_out : out std_logic_vector(15 downto 0)
+		);
+	end component draw_score;
 
 --Component description ends
 
@@ -121,7 +130,7 @@ architecture arch of cs305_project is
 	signal current_score_1, current_score_2 : std_logic_vector(3 downto 0);
 	signal pixel_row, pixel_col : std_logic_vector(9 downto 0);
 	signal bullet_y_pos, bullet_x_pos : std_logic_vector(9 downto 0);
-	signal layers : std_logic_vector(47 downto 0);
+	signal layers : std_logic_vector(63 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
 
 begin
@@ -135,10 +144,11 @@ begin
 	UserTank : user_tank port map(divided_clk, pixel_row, pixel_col, mouse_x_location, user_location, layers(47 downto 32));
 	UserBullet : bullet port map(divided_clk, bullet_shot, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(31 downto 16));
 	AiTank : ai_tank port map(divided_clk, ai_reset, ai_hold, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision, layers(15 downto 0));
-	LayerControl : layer_control port map(layers, RGB_out);
+	LayerControl : layer_control generic map (4) port map(layers, RGB_out);
 	DisplayControl : VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, pixel_row, pixel_col);
-
+	DrawScore : draw_score port map (divided_clk, current_score_1, current_score_2, pixel_row, pixel_col, layers(63 downto 48));
+	
 	btn_1 <= NOT bt2;
 	left_btn <= left_button;
-
+	
 end architecture arch;
