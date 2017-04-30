@@ -50,9 +50,11 @@ begin
 
 			if(counter = "111111111111111111" AND hold = '0') then
 				if(x = std_logic_vector(to_unsigned(640, 10))) then
+					y <= y + 20;
 					moveDir <= '1';
 				elsif(x = "0000000000") then
 					moveDir <= '0';
+					y <= y + 20;
 				end if;
 
 				if(moveDir = '0') then
@@ -66,7 +68,7 @@ begin
 
 	collisions : process (bullet_y_pos, bullet_x_pos, x) is
 	begin
-		if(bullet_y_pos < std_logic_vector(to_unsigned(80 + height/2, 10)) AND bullet_y_pos > std_logic_vector(to_unsigned(80 - height/2, 10))) then
+		if(bullet_y_pos < y + height/2 AND bullet_y_pos > y - height/2) then
 			if(bullet_x_pos < x + width/2 AND bullet_x_pos + width/2 > x) then
 				collision <= '1';
 			else
