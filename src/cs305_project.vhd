@@ -17,7 +17,7 @@ end entity cs305_project;
 
 architecture arch of cs305_project is
 
-	constant NUM_LAYERS : integer := 4;
+	constant NUM_LAYERS : integer := 5;
 
 --Component description begins
 
@@ -62,7 +62,7 @@ architecture arch of cs305_project is
 
 	component layer_control is
 		generic (
-			NUM_INPUTS : integer := 3
+			NUM_INPUTS : integer := 4
 		);
 		port (
 			layers : IN pixel((NUM_INPUTS - 1) downto 0);
@@ -126,6 +126,14 @@ architecture arch of cs305_project is
 		);
 	end component draw_score;
 
+	component background is
+	port (
+		clock : IN std_logic;
+		pixel_row, pixel_col : IN std_logic_vector(9 downto 0);
+		RGB_out	: OUT std_logic_vector(15 downto 0)
+	);
+	end component background;
+
 --Component description ends
 
 	signal divided_clk, left_button, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score : std_logic;
@@ -150,6 +158,7 @@ begin
 	LayerControl : layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
 	DisplayControl : VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, pixel_row, pixel_col);
 	DrawScore : draw_score port map (divided_clk, current_score_1, current_score_2, pixel_row, pixel_col, layers(3));
+	BackgorundImage : background port map (divided_clk, pixel_row, pixel_col, layers(4));
 	
 	btn_1 <= NOT bt2;
 	left_btn <= left_button;
