@@ -17,8 +17,9 @@ architecture arch of ai_tank is
 	constant height : natural := 54;
 
 	signal x : std_logic_vector(9 downto 0);
-	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
+	signal y : std_logic_vector(9 downto 0);
 	signal moveDir : std_logic := '0';
+	constant intital_y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
 	component draw_object is
 		generic (
 			image_path : string;
@@ -44,6 +45,7 @@ begin
 				rand_in := unsigned(new_pos);
 				intermediate := std_logic_vector(("0"&rand_in&"0000") + ("0000"&rand_in&"0") + ("00000"&rand_in));
 				x <= intermediate(14 downto 5);
+				y <= intital_y;
 			end if;
 
 			counter := counter +1;
