@@ -13,6 +13,9 @@ entity ai_tank is
 end entity ai_tank;
 
 architecture arch of ai_tank is
+	constant width : natural := 80;
+	constant height : natural := 24;
+
 	signal x : std_logic_vector(9 downto 0);
 	signal y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
 	signal moveDir : std_logic := '0';
@@ -28,14 +31,19 @@ architecture arch of ai_tank is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object generic map ("images/tank2.mif", 80, 24) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object generic map ("images/tank2.mif", width, height) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 	movement : process( clock )
 		variable counter : std_logic_vector(17 downto 0) := "000000000000000000";
+		variable rand_in : unsigned(9 downto 0);
+		variable intermediate : std_logic_vector(14 downto 0);
 	begin
 		if(rising_edge(clock)) then
 			if(reset = '1') then
-				x <= new_pos;
+				-- Multiply by ~0.6 using (<<4 + <<1 + <<0)>>5
+				rand_in := unsigned(new_pos);
+				intermediate := std_logic_vector(("0"&rand_in&"0000") + ("0000"&rand_in&"0") + ("00000"&rand_in));
+				x <= intermediate(14 downto 5);
 			end if;
 
 			counter := counter +1;
@@ -58,8 +66,8 @@ begin
 
 	collisions : process (bullet_y_pos, bullet_x_pos, x) is
 	begin
-		if(bullet_y_pos < std_logic_vector(to_unsigned(90, 10)) AND bullet_y_pos > std_logic_vector(to_unsigned(70, 10))) then
-			if(bullet_x_pos < x+10 AND bullet_x_pos > x-10) then
+		if(bullet_y_pos < std_logic_vector(to_unsigned(80 + height/2, 10)) AND bullet_y_pos > std_logic_vector(to_unsigned(80 - height/2, 10))) then
+			if(bullet_x_pos < x + width/2 AND bullet_x_pos + width/2 > x) then
 				collision <= '1';
 			else
 				collision <= '0';
