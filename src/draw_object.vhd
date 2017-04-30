@@ -39,8 +39,8 @@ begin
 	process (pixel_row, pixel_col, x, y, RGB) is
 	begin
 		RGB_out <= X"0000";
-		if (x < pixel_col + width/2) and (x + width/2 > pixel_col) then
-			if (y < pixel_row + height/2) and (y + height/2 > pixel_row) then
+		if (x < pixel_col + width/2) and (x + width/2 >= pixel_col) then
+			if (y <= pixel_row + height/2) and (y + height/2 > pixel_row) then
 				RGB_out <= RGB;
 			end if;
 		end if;
