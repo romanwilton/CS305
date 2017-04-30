@@ -27,5 +27,6 @@ begin
 			"1000110" when "1100", --C
 			"0100001" when "1101", --D
 			"0000100" when "1110", --E
-			"0001110" when "1111"; --F
+			"0001110" when "1111", --F
+			"XXXXXXX" when others;
 end behaviour;	
