@@ -73,10 +73,16 @@ BEGIN
 	
 	process (pixel_x, pixel_y, show_x, show_y) is
 		variable x, y : unsigned(9 downto 0);
+		variable address_temp : std_logic_vector(15 downto 0);
 	begin
 		x := unsigned(pixel_x) + width/2 - unsigned(show_x);
 		y := unsigned(pixel_y) + height/2 - unsigned(show_y);
-		rom_address <= std_logic_vector((y + x(7 downto 0)*to_unsigned(height, 8)));
+		address_temp := std_logic_vector((y + x(7 downto 0)*to_unsigned(height, 8)));
+		if address_temp < width*height then
+			rom_address <= address_temp;
+		else
+			rom_address <= X"0000";
+		end if;
 	end process;
 	
 	RGB <= rom_data;

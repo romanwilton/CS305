@@ -1,0 +1,16 @@
+
+-- MADE BY T. Dendale
+-- WIDTH =  2
+-- HEIGHT = 2
+
+DEPTH = 4;
+WIDTH = 16;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = HEX;
+CONTENT
+BEGIN
+0:	F000;
+1:	F111;
+2:	F222;
+3:	F333;
+END;

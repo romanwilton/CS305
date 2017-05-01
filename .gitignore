@@ -2,13 +2,16 @@
 !.gitignore
 !src/
 !images/
+!test/
 !*.vhd
 !*.bdf
 !*.bsf
 !*.csv
 !*.mif
 !*.qpf
-!*.qpf
 !*.qsf
 !*.png
 !*.py
+!*.vwf
+!*.tcl
+!*.ps1
