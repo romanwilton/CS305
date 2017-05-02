@@ -37,14 +37,21 @@ begin
 	movement : process (clock) is
 		variable rand_in : unsigned(9 downto 0);
 		variable intermediate : std_logic_vector(14 downto 0);
+		variable x_var : std_logic_vector(9 downto 0);
 	begin
 		if (rising_edge(clock)) then
 			if(reset = '1') then
 				-- Multiply by ~0.6 using (<<4 + <<1 + <<0)>>5
 				rand_in := unsigned(new_pos);
 				intermediate := std_logic_vector(("0"&rand_in&"0000") + ("0000"&rand_in&"0") + ("00000"&rand_in));
-				x <= intermediate(14 downto 5);
+				x_var := intermediate(14 downto 5);
+				x <= x_var;
 				y <= intital_y;
+				if x_var > 320 then
+					moveDir <= '1';
+				else
+					moveDir <= '0';
+				end if; 
 			end if;
 
 			if (enable_move = '1' AND hold = '0') then
