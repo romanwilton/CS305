@@ -2,6 +2,7 @@ LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
+use work.util.all;
 
 entity draw_score is
 	port(
@@ -23,61 +24,125 @@ architecture arch of draw_score is
 		);
 	end component char_rom;
 	
-	component draw_character is
+	component draw_string is
 		generic (
-			x, y : in natural
+			N, x, y : in natural
 		);
 		port (
-			digit : in std_logic_vector(3 downto 0);
+			clk : in std_logic;
+			str : in char_array(N-1 downto 0);
 			pixel_row, pixel_col : in std_logic_vector(9 downto 0);
 			enable : out std_logic;
 			character_address : OUT STD_LOGIC_VECTOR (5 DOWNTO 0);
 			font_row, font_col : OUT STD_LOGIC_VECTOR (2 DOWNTO 0)
 		);
-	end component draw_character;
+	end component draw_string;
 	
-	signal character_address, ca1, ca2 : STD_LOGIC_VECTOR (5 DOWNTO 0);
-	signal row, col, row1, col1, row2, col2: STD_LOGIC_VECTOR (2 DOWNTO 0);
-	signal rom_out, en1, en2 : std_logic;
+	signal character_address : STD_LOGIC_VECTOR (5 DOWNTO 0);
+	signal row, col : STD_LOGIC_VECTOR (2 DOWNTO 0);
+	signal rom_out : std_logic;
+	
+	signal all_signals, next_pixel_signals : signals_array(1 downto 0);
+	signal pixel_row_next, pixel_col_next : std_logic_vector(9 downto 0);
 
 begin
 
+	next_pixel_calc : process (pixel_row, pixel_col) is
+	begin
+		if (pixel_row = "0111100000") then --480
+			pixel_col_next <= "0000000000";
+			pixel_row_next <= "0000000000";
+		elsif (pixel_col = "1001111111") then --639
+			pixel_col_next <= "0000000000";
+			pixel_row_next <= pixel_row + 1;
+		else
+			pixel_col_next <= pixel_col + 1;
+			pixel_row_next <= pixel_row;
+		end if;
+	end process next_pixel_calc;
+
 	CHARACTER_ROM: char_rom port map (character_address, row, col, clk, rom_out);
 	
-	DIGIT1_DRAW : draw_character generic map (592, 10) 
-		port map (digit1, pixel_row, pixel_col, en1, ca1, row1, col1);
-	DIGIT2_DRAW : draw_character generic map (582, 10) 
-		port map (digit2, pixel_row, pixel_col, en2, ca2, row2, col2);
+	LINE1 : draw_string 
+	generic map (
+		N => 8, x => 582, y => 10
+	)
+	port map (
+		clk => clk,
+		str => (O"23", O"03", O"17", O"22", O"05", O"40", O"60" + digit2, O"60" + digit1),
+		pixel_row => pixel_row, pixel_col => pixel_col,
+		enable => all_signals(0).enable,
+		character_address => all_signals(0).character_address,
+		font_row => all_signals(0).font_row,
+		font_col => all_signals(0).font_col
+	);
 	
-	process (en1, en2, ca1, ca2, row1, row2, col1, col2) is
-	begin
+	LINE2 : draw_string 
+	generic map (
+		N => 8, x => 582, y => 20
+	)
+	port map (
+		clk => clk,
+		str => (O"23", O"03", O"17", O"22", O"05", O"40", O"60" + digit2, O"60" + digit1),
+		pixel_row => pixel_row, pixel_col => pixel_col,
+		enable => all_signals(1).enable,
+		character_address => all_signals(1).character_address,
+		font_row => all_signals(1).font_row,
+		font_col => all_signals(1).font_col
+	);
 	
+	LINE1_NEXT : draw_string 
+	generic map (
+		N => 8, x => 582, y => 10
+	)
+	port map (
+		clk => clk,
+		str => (O"23", O"03", O"17", O"22", O"05", O"40", O"60" + digit2, O"60" + digit1),
+		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
+		enable => next_pixel_signals(0).enable,
+		character_address => next_pixel_signals(0).character_address,
+		font_row => next_pixel_signals(0).font_row,
+		font_col => next_pixel_signals(0).font_col
+	);
+	
+	LINE2_NEXT : draw_string 
+	generic map (
+		N => 8, x => 582, y => 20
+	)
+	port map (
+		clk => clk,
+		str => (O"23", O"03", O"17", O"22", O"05", O"40", O"60" + digit2, O"60" + digit1),
+		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
+		enable => next_pixel_signals(1).enable,
+		character_address => next_pixel_signals(1).character_address,
+		font_row => next_pixel_signals(1).font_row,
+		font_col => next_pixel_signals(1).font_col
+	);
+	
+	next_pixel : process (next_pixel_signals) is
+	begin	
 		character_address <= "000000";
 		row <= "000";
 		col <= "000";
-	
-		if en1 = '1' then
-			character_address <= ca1;
-			row <= row1;
-			col <= col1;
-		end if;
-		
-		if en2 = '1' then
-			character_address <= ca2;
-			row <= row2;
-			col <= col2;
-		end if;
-	
-	end process;
-	
-	process (rom_out, en1, en2) is
-	begin
-		colour_out <= X"0000";
-		if (en1 = '1' or en2 = '1') then
-			if (rom_out = '1') then
-				colour_out <= "1000000000011111";
+		for i in 1 downto 0 loop
+			if next_pixel_signals(i).enable = '1' then
+				character_address <= next_pixel_signals(i).character_address;
+				row <= next_pixel_signals(i).font_row;
+				col <= next_pixel_signals(i).font_col;
 			end if;
-		end if;
-	end process;
+		end loop;
+	end process next_pixel;
+	
+	output : process (rom_out, all_signals) is
+	begin
+		colour_out <= X"0000";		
+		for i in 1 downto 0 loop
+			if all_signals(i).enable = '1' then
+				if (rom_out = '1') then
+					colour_out <= "1000000000011111";
+				end if;
+			end if;
+		end loop;
+	end process output;
 	
 end architecture arch;

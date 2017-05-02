@@ -8,7 +8,7 @@ entity draw_character is
 		x, y : in natural
 	);
 	port (
-		digit : in std_logic_vector(3 downto 0);
+		char : in std_logic_vector(5 downto 0);
 		pixel_row, pixel_col : in std_logic_vector(9 downto 0);
 		enable : out std_logic;
 		character_address : OUT STD_LOGIC_VECTOR (5 DOWNTO 0);
@@ -19,7 +19,7 @@ end entity draw_character;
 architecture arch of draw_character is
 begin
 	
-	process (pixel_col, pixel_row, digit) is
+	process (pixel_col, pixel_row, char) is
 		variable col_v, row_v : STD_LOGIC_VECTOR(9 DOWNTO 0);
 	begin
 		
@@ -30,7 +30,7 @@ begin
 	
 		if (pixel_col >= x and pixel_col < (x + 8)) then
 			if (pixel_row >= y and pixel_row < (y + 8)) then
-				character_address <= O"60" + digit;
+				character_address <= char;
 				col_v := pixel_col - x;
 				font_col <= col_v(2 downto 0);
 				row_v := pixel_row - y;
