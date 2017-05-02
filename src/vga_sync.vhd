@@ -8,7 +8,7 @@ ENTITY VGA_SYNC IS
 		clock_25Mhz : IN STD_LOGIC;
 		red, green, blue : IN STD_LOGIC_VECTOR(3 downto 0);
 		red_out, green_out, blue_out : OUT STD_LOGIC_VECTOR(3 downto 0);
-		horiz_sync_out, vert_sync_out : OUT STD_LOGIC;
+		horiz_sync_out, vert_sync_out, enable_move : OUT STD_LOGIC;
 		pixel_row, pixel_column: OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
 	);
 END VGA_SYNC;
@@ -77,6 +77,12 @@ BEGIN
 		ELSE
 			video_on_v <= '0';
 		END IF;
+		
+		if v_count = 480 and h_count = 0 then
+			enable_move <= '1';
+		else 
+			enable_move <= '0';
+		end if;
 
 		-- Put all video signals through DFFs to elminate any delays that cause a blurry image
 		if video_on = '1' then

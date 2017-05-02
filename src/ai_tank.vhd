@@ -5,7 +5,7 @@ use IEEE.numeric_std.all;
 
 entity ai_tank is
 	port (
-		clock, reset, hold : IN std_logic;
+		clock, reset, hold, enable_move : IN std_logic;
 		pixel_row, pixel_col, new_pos, bullet_x_pos, bullet_y_pos : IN std_logic_vector(9 downto 0);
 		collision	: OUT std_logic;
 		RGB_out	: OUT std_logic_vector(15 downto 0)
@@ -34,12 +34,11 @@ architecture arch of ai_tank is
 begin
 	output_drawing : draw_object generic map ("images/enemyTank.mif", width, height) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
-	movement : process( clock )
-		variable counter : std_logic_vector(17 downto 0) := "000000000000000000";
+	movement : process (clock) is
 		variable rand_in : unsigned(9 downto 0);
 		variable intermediate : std_logic_vector(14 downto 0);
 	begin
-		if(rising_edge(clock)) then
+		if (rising_edge(clock)) then
 			if(reset = '1') then
 				-- Multiply by ~0.6 using (<<4 + <<1 + <<0)>>5
 				rand_in := unsigned(new_pos);
@@ -48,27 +47,27 @@ begin
 				y <= intital_y;
 			end if;
 
-			counter := counter +1;
-
-			if(counter = "111111111111111111" AND hold = '0') then
-				if(x = std_logic_vector(to_unsigned(640, 10))) then
+			if (enable_move = '1' AND hold = '0') then
+				
+				if (x >= std_logic_vector(to_unsigned(640, 10))) and (x <= std_logic_vector(to_unsigned(650, 10))) then
 					y <= y + 20;
 					moveDir <= '1';
-				elsif(x = "0000000000") then
+				elsif (x >= std_logic_vector(to_unsigned(800, 10))) then
 					moveDir <= '0';
 					y <= y + 20;
 				end if;
 
 				if(moveDir = '0') then
-					x <= x+1;
+					x <= x+3;
 				else
-					x <= x-1; 	
+					x <= x-3; 	
 				end if; 
+				
 			end if;
 		end if;
 	end process ; -- movement
 
-	collisions : process (bullet_y_pos, bullet_x_pos, x) is
+	collisions : process (bullet_y_pos, bullet_x_pos, x, y) is
 	begin
 		if(bullet_y_pos < y + height/2 AND bullet_y_pos > y - height/2) then
 			if(bullet_x_pos < x + width/2 AND bullet_x_pos + width/2 > x) then
