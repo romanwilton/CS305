@@ -11,7 +11,7 @@ entity cs305_project is
 		horiz_sync_out, vert_sync_out : OUT std_logic;
 		state_ind : OUT std_logic_vector(3 downto 0);
 		red_out, green_out, blue_out : OUT std_logic_vector(3 downto 0);
-		seg0, seg1 : OUT std_logic_vector(6 downto 0)
+		seg0, seg1, seg3 : OUT std_logic_vector(6 downto 0)
 	);
 end entity cs305_project;
 
@@ -134,6 +134,13 @@ architecture arch of cs305_project is
 	);
 	end component background;
 
+	component streakCounter is
+	port (
+		clock, ai_reset, offscreen : IN std_logic;
+		streak : OUT std_logic_vector(3 downto 0)
+	);
+	end component streakCounter;
+
 --Component description ends
 
 	signal divided_clk, left_button, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score : std_logic;
@@ -144,6 +151,7 @@ architecture arch of cs305_project is
 	signal layers : pixel(NUM_LAYERS-1 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
 	signal not_bt2, enable_move : std_logic;
+	signal hitStreak : std_logic_vector(3 downto 0);
 
 begin
 	ClockDivider : clock_div port map(clk, divided_clk);
@@ -152,6 +160,7 @@ begin
 	ScoreCounter : counter port map(increase_score, current_score_1, current_score_2);
 	SevenSegDecoder1 : dec_7seg port map(current_score_1, seg0);
 	SevenSegDecoder2 : dec_7seg port map(current_score_2, seg1);
+	SevenSegDecoder3 : dec_7seg port map(hitStreak, seg3);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	UserTank : user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(2));
 	UserBullet : bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(1));
@@ -160,6 +169,7 @@ begin
 	DisplayControl : VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col);
 	DrawScore : draw_score port map (divided_clk, current_score_1, current_score_2, pixel_row, pixel_col, layers(3));
 	BackgorundImage : background port map (divided_clk, pixel_row, pixel_col, layers(4));
+	StreakingCount : streakCounter port map(divided_clk, ai_reset, off_screen, hitStreak);
 	
 	not_bt2 <= NOT bt2;
 	btn_1 <= NOT bt2;
