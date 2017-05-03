@@ -141,9 +141,16 @@ architecture arch of cs305_project is
 		);
 	end component streakCounter;
 
+	component debounce is
+		port (
+			clock, button : IN std_logic;
+			Q : OUT std_logic
+		);
+	end component debounce;
+
 --Component description ends
 
-	signal divided_clk, left_button, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score, increase_streak : std_logic;
+	signal divided_clk, left_button, shoot_signal, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score, increase_streak : std_logic;
 	signal mouse_x_location, random_pos, user_location : std_logic_vector(9 downto 0);
 	signal current_score_1, current_score_2 : std_logic_vector(3 downto 0);
 	signal pixel_row, pixel_col : std_logic_vector(9 downto 0);
@@ -156,7 +163,8 @@ architecture arch of cs305_project is
 begin
 	ClockDivider : clock_div port map(clk, divided_clk);
 	MouseController : MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, open, mouse_x_location);
-	StateMachine : fsm port map(divided_clk, not_bt2, left_button, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score, increase_streak, state_ind);
+	MouseDebouncer : debounce port map(divided_clk, left_button, shoot_signal);
+	StateMachine : fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score, increase_streak, state_ind);
 	ScoreCounter : counter port map(increase_score, current_score_1, current_score_2);
 	SevenSegDecoder1 : dec_7seg port map(current_score_1, seg0);
 	SevenSegDecoder2 : dec_7seg port map(current_score_2, seg1);
@@ -174,6 +182,6 @@ begin
 	
 	not_bt2 <= NOT bt2;
 	btn_1 <= NOT bt2;
-	left_btn <= left_button;
+	left_btn <= shoot_signal;
 	
 end architecture arch;

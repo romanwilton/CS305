@@ -2,6 +2,7 @@
 !.gitignore
 !src/
 !images/
+!images/Source/
 !test/
 !*.vhd
 !*.bdf
@@ -15,3 +16,4 @@
 !*.vwf
 !*.tcl
 !*.ps1
+!*.pdn
