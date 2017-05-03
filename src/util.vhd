@@ -18,6 +18,7 @@ package util is
 	type two_digit_num is array (1 downto 0) of std_logic_vector(3 downto 0);
 	
 	function string2char_array(str : string) return char_array;
+	function num2char_array(num : two_digit_num) return char_array;
 	
 end util;
 
@@ -40,5 +41,14 @@ package body util is
 		end loop;
 		return output;
 	end string2char_array;
+	
+	function num2char_array(num : two_digit_num) return char_array is
+		variable output : char_array(1 downto 0);
+	begin
+		for i in 1 downto 0 loop
+			output(i) := O"60" + num(i);
+		end loop;
+		return output;
+	end num2char_array;
 
 end package body util;

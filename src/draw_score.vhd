@@ -69,7 +69,7 @@ begin
 	)
 	port map (
 		clk => clk,
-		str => string2char_array(" SCORE = ") & char_array'(O"60" + score(1), O"60" + score(0)),
+		str => string2char_array(" SCORE = ") & num2char_array(score),
 		pixel_row => pixel_row, pixel_col => pixel_col,
 		enable => all_signals(0).enable,
 		character_address => all_signals(0).character_address,
@@ -83,7 +83,7 @@ begin
 	)
 	port map (
 		clk => clk,
-		str => string2char_array("STREAK = ") & char_array'(O"60" + streak(1), O"60" + streak(0)),
+		str => string2char_array("STREAK = ") & num2char_array(streak),
 		pixel_row => pixel_row, pixel_col => pixel_col,
 		enable => all_signals(1).enable,
 		character_address => all_signals(1).character_address,
@@ -97,7 +97,7 @@ begin
 	)
 	port map (
 		clk => clk,
-		str => string2char_array(" SCORE = ") & char_array'(O"60" + score(1), O"60" + score(0)),
+		str => string2char_array(" SCORE = ") & num2char_array(score),
 		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
 		enable => next_pixel_signals(0).enable,
 		character_address => next_pixel_signals(0).character_address,
@@ -111,7 +111,7 @@ begin
 	)
 	port map (
 		clk => clk,
-		str => string2char_array("STREAK = ") & char_array'(O"60" + streak(1), O"60" + streak(0)),
+		str => string2char_array("STREAK = ") & num2char_array(streak),
 		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
 		enable => next_pixel_signals(1).enable,
 		character_address => next_pixel_signals(1).character_address,
