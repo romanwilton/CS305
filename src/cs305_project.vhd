@@ -120,7 +120,7 @@ architecture arch of cs305_project is
 	component draw_score is
 		port(
 			clk : in std_logic;
-			digit1, digit2 : in std_logic_vector(3 downto 0);
+			score, streak : in two_digit_num;
 			pixel_row, pixel_col : in std_logic_vector(9 downto 0);
 			colour_out : out std_logic_vector(15 downto 0)
 		);
@@ -167,7 +167,7 @@ begin
 	AiTank : ai_tank port map(divided_clk, ai_reset, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision, layers(0));
 	LayerControl : layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
 	DisplayControl : VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col);
-	DrawScore : draw_score port map (divided_clk, current_score_1, current_score_2, pixel_row, pixel_col, layers(3));
+	DrawScore : draw_score port map (divided_clk, (current_score_2, current_score_1), ("0000", hitStreak), pixel_row, pixel_col, layers(3));
 	BackgorundImage : background port map (divided_clk, pixel_row, pixel_col, layers(4));
 	StreakingCount : streakCounter port map(divided_clk, ai_reset, off_screen, hitStreak);
 	

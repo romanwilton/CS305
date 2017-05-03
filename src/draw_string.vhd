@@ -40,7 +40,7 @@ begin
 	GEN : for i in (N-1) downto 0 generate
 		CHARACTER_DRAW : draw_character
 		generic map (
-			x => x + i*8, y => y
+			x => x + (N-1-i)*8, y => y
 		)
 		port map (
 			char => str(i),

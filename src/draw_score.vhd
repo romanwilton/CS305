@@ -7,7 +7,7 @@ use work.util.all;
 entity draw_score is
 	port(
 		clk : in std_logic;
-		digit1, digit2 : in std_logic_vector(3 downto 0);
+		score, streak : in two_digit_num;
 		pixel_row, pixel_col : in std_logic_vector(9 downto 0);
 		colour_out : out std_logic_vector(15 downto 0)
 	);
@@ -65,11 +65,11 @@ begin
 	
 	LINE1 : draw_string 
 	generic map (
-		N => 8, x => 582, y => 10
+		N => 8, x => 530, y => 10
 	)
 	port map (
 		clk => clk,
-		str => (O"23", O"03", O"17", O"22", O"05", O"40", O"60" + digit2, O"60" + digit1),
+		str => string2char_array("SCORE") & char_array'(O"40", O"60" + score(1), O"60" + score(0)),
 		pixel_row => pixel_row, pixel_col => pixel_col,
 		enable => all_signals(0).enable,
 		character_address => all_signals(0).character_address,
@@ -79,11 +79,11 @@ begin
 	
 	LINE2 : draw_string 
 	generic map (
-		N => 8, x => 582, y => 20
+		N => 9, x => 530, y => 20
 	)
 	port map (
 		clk => clk,
-		str => (O"23", O"03", O"17", O"22", O"05", O"40", O"60" + digit2, O"60" + digit1),
+		str => string2char_array("STREAK") & char_array'(O"40", O"60" + streak(1), O"60" + streak(0)),
 		pixel_row => pixel_row, pixel_col => pixel_col,
 		enable => all_signals(1).enable,
 		character_address => all_signals(1).character_address,
@@ -93,11 +93,11 @@ begin
 	
 	LINE1_NEXT : draw_string 
 	generic map (
-		N => 8, x => 582, y => 10
+		N => 8, x => 530, y => 10
 	)
 	port map (
 		clk => clk,
-		str => (O"23", O"03", O"17", O"22", O"05", O"40", O"60" + digit2, O"60" + digit1),
+		str => string2char_array("SCORE") & char_array'(O"40", O"60" + score(1), O"60" + score(0)),
 		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
 		enable => next_pixel_signals(0).enable,
 		character_address => next_pixel_signals(0).character_address,
@@ -107,11 +107,11 @@ begin
 	
 	LINE2_NEXT : draw_string 
 	generic map (
-		N => 8, x => 582, y => 20
+		N => 9, x => 530, y => 20
 	)
 	port map (
 		clk => clk,
-		str => (O"23", O"03", O"17", O"22", O"05", O"40", O"60" + digit2, O"60" + digit1),
+		str => string2char_array("STREAK") & char_array'(O"40", O"60" + streak(1), O"60" + streak(0)),
 		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
 		enable => next_pixel_signals(1).enable,
 		character_address => next_pixel_signals(1).character_address,
