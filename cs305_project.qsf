@@ -133,6 +133,7 @@ set_location_assignment PIN_B19 -to seg3[3]
 set_location_assignment PIN_C19 -to seg3[4]
 set_location_assignment PIN_D19 -to seg3[5]
 set_location_assignment PIN_G15 -to seg3[6]
+set_global_assignment -name VHDL_FILE src/draw_string.vhd
 set_location_assignment PIN_D15 -to seg2[0]
 set_location_assignment PIN_A16 -to seg2[1]
 set_location_assignment PIN_B16 -to seg2[2]
