@@ -5,7 +5,7 @@ use IEEE.std_logic_unsigned.all;
 entity fsm is
 	port (
 		clock, btn_1, left_btn, right_btn, off_screen, collision : IN std_logic;
-		bullet_shot, ai_reset, ai_hold, increase_score : OUT std_logic;
+		bullet_shot, ai_reset, ai_hold, increase_score, increase_streak : OUT std_logic;
 		state_indicator : OUT std_logic_vector(3 downto 0)
 	);
 end entity fsm;
@@ -55,36 +55,29 @@ begin
 	
 	output_logic : process (state) is
 	begin
+		bullet_shot <= '0';
+		increase_score <= '0';
+		ai_reset <= '0';
+		ai_hold <= '0';
+		increase_streak <= '0';
+
 		case state is
 			when start =>
-				bullet_shot <= '0';
-				increase_score <= '0';
 				ai_reset <= '1';
-				ai_hold <= '0';
 				state_indicator <= "0001";
 			when hold =>
-				bullet_shot <= '0';
-				increase_score <= '0';
-				ai_reset <= '0';
 				ai_hold <= '1';
 				state_indicator <= "0001";
 			when not_shot =>
-				bullet_shot <= '0';
-				increase_score <= '0';
-				ai_reset <= '0';
-				ai_hold <= '0';
 				state_indicator <= "0010";
 			when shot =>
 				bullet_shot <= '1';
-				increase_score <= '0';
-				ai_reset <= '0';
-				ai_hold <= '0';
+
 				state_indicator <= "0100";
 			when collided =>
-				bullet_shot <= '0';
 				increase_score <= '1';
 				ai_reset <= '1';
-				ai_hold <= '0';
+				increase_streak <= '1';
 				state_indicator <= "1000";
 		end case;
 	end process output_logic;
