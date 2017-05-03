@@ -28,8 +28,15 @@ package body util is
 		variable temp : std_logic_vector(9 downto 0);
 	begin
 		for i in 1 to str'length loop
-			temp := std_logic_vector(to_unsigned(character'pos(str(i)), 10) - to_unsigned(64, 10));
-			output(str'length-i) := temp(5 downto 0);
+			case str(i) is
+				when '=' => 
+					output(str'length-i) := O"72";
+				when ' ' => 
+					output(str'length-i) := O"40";
+				when others =>
+					temp := std_logic_vector(to_unsigned(character'pos(str(i)), 10) - to_unsigned(64, 10));
+					output(str'length-i) := temp(5 downto 0);
+			end case;
 		end loop;
 		return output;
 	end string2char_array;
