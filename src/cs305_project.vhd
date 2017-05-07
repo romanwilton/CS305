@@ -18,6 +18,8 @@ end entity cs305_project;
 architecture arch of cs305_project is
 
 	constant NUM_LAYERS : integer := 5;
+	constant N_SCORE : integer := 3;
+	constant N_STREAK : integer := 2;
 
 --Component description begins
 
@@ -35,13 +37,6 @@ architecture arch of cs305_project is
 			rand_num :  OUT  std_logic_vector(9 downto 0)
 		);
 	end component rand_gen;
-
-	component counter is
-		port (
-			count : IN std_logic;
-			Q_1, Q_2 : OUT std_logic_vector(3 downto 0)
-		);
-	end component counter;
 
 	component dec_7seg is
 		port(
@@ -118,9 +113,13 @@ architecture arch of cs305_project is
 	end component bullet;
 	
 	component draw_score is
+		generic (
+			SCORE_N, STREAK_N : integer := 2
+		);
 		port(
 			clk : in std_logic;
-			score, streak : in two_digit_num;
+			score : in N_digit_num(SCORE_N-1 downto 0);
+			streak : in N_digit_num(STREAK_N-1 downto 0);
 			pixel_row, pixel_col : in std_logic_vector(9 downto 0);
 			colour_out : out std_logic_vector(15 downto 0)
 		);
@@ -134,12 +133,15 @@ architecture arch of cs305_project is
 		);
 	end component background;
 
-	component streakCounter is
-		port (
-			clock, ai_reset, offscreen : IN std_logic;
-			Q_1, Q_2 : OUT std_logic_vector(3 downto 0)
+	component counter is
+		generic (
+			N : integer := 2 
 		);
-	end component streakCounter;
+		port (
+			clock, count, reset : IN std_logic;
+			Q : OUT N_digit_num(N-1 downto 0)
+		);
+	end component counter;
 
 	component debounce is
 		port (
@@ -152,33 +154,33 @@ architecture arch of cs305_project is
 
 	signal divided_clk, left_button, shoot_signal, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score, increase_streak : std_logic;
 	signal mouse_x_location, random_pos, user_location : std_logic_vector(9 downto 0);
-	signal current_score_1, current_score_2 : std_logic_vector(3 downto 0);
 	signal pixel_row, pixel_col : std_logic_vector(9 downto 0);
 	signal bullet_y_pos, bullet_x_pos : std_logic_vector(9 downto 0);
 	signal layers : pixel(NUM_LAYERS-1 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
 	signal not_bt2, enable_move : std_logic;
-	signal hitStreak1, hitStreak2  : std_logic_vector(3 downto 0);
+	signal current_score : N_digit_num(N_SCORE-1 downto 0);
+	signal streak_score : N_digit_num(N_STREAK-1 downto 0);
 
 begin
 	ClockDivider : clock_div port map(clk, divided_clk);
 	MouseController : MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, open, mouse_x_location);
 	MouseDebouncer : debounce port map(divided_clk, left_button, shoot_signal);
 	StateMachine : fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision, bullet_shot, ai_reset, ai_hold, increase_score, increase_streak, state_ind);
-	ScoreCounter : counter port map(increase_score, current_score_1, current_score_2);
-	SevenSegDecoder1 : dec_7seg port map(current_score_1, seg0);
-	SevenSegDecoder2 : dec_7seg port map(current_score_2, seg1);
-	SevenSegDecoder3 : dec_7seg port map(hitStreak1, seg2);
-	SevenSegDecoder4 : dec_7seg port map(hitStreak2, seg3);
+	SevenSegDecoder1 : dec_7seg port map(current_score(0), seg0);
+	SevenSegDecoder2 : dec_7seg port map(current_score(1), seg1);
+	SevenSegDecoder3 : dec_7seg port map(current_score(2), seg2);
+	SevenSegDecoder4 : dec_7seg port map("0000", seg3);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	UserTank : user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(2));
 	UserBullet : bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(1));
 	AiTank : ai_tank port map(divided_clk, ai_reset, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision, layers(0));
 	LayerControl : layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
 	DisplayControl : VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col);
-	DrawScore : draw_score port map (divided_clk, (current_score_2, current_score_1), (hitStreak2, hitStreak1), pixel_row, pixel_col, layers(3));
+	DrawScore : draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, pixel_row, pixel_col, layers(3));
 	BackgorundImage : background port map (divided_clk, pixel_row, pixel_col, layers(4));
-	StreakingCount : streakCounter port map(divided_clk, increase_streak, off_screen, hitStreak1, hitStreak2);
+	ScoreCounter : counter generic map (N_SCORE) port map(divided_clk, increase_score, '0', current_score);
+	StreakCounter : counter generic map (N_STREAK) port map(divided_clk, increase_streak, off_screen, streak_score);
 	
 	not_bt2 <= NOT bt2;
 	btn_1 <= NOT bt2;
