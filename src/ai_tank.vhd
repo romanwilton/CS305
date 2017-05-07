@@ -15,12 +15,14 @@ end entity ai_tank;
 architecture arch of ai_tank is
 	constant width : natural := 50;
 	constant height : natural := 54;
+	constant intital_y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
 
 	signal x : std_logic_vector(9 downto 0);
 	signal y : std_logic_vector(9 downto 0);
 	signal moveDir : std_logic := '0';
-	signal s_collision : std_logic;
-	constant intital_y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
+	signal s_collision, do_display : std_logic := '0';
+	signal RGB : std_logic_vector(15 downto 0);
+	
 	component draw_object is
 		generic (
 			image_path : string;
@@ -33,7 +35,7 @@ architecture arch of ai_tank is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object generic map ("images/enemyTank.mif", width, height) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : draw_object generic map ("images/enemyTank.mif", width, height) port map(clock, pixel_row, pixel_col, x, y, RGB);
 
 	movement : process (clock) is
 		variable rand_in : unsigned(9 downto 0);
@@ -42,6 +44,9 @@ begin
 	begin
 		if (rising_edge(clock)) then
 			if (reset = '1' or (respawn = '1' and s_collision = '1')) then
+			
+				do_display <= '1';
+			
 				-- Multiply by ~0.6 using (<<4 + <<1 + <<0)>>5
 				rand_in := unsigned(new_pos);
 				intermediate := std_logic_vector(("0"&rand_in&"0000") + ("0000"&rand_in&"0") + ("00000"&rand_in));
@@ -89,4 +94,5 @@ begin
 	end process ; -- collisions
 	
 	collision <= s_collision;
+	RGB_out <= RGB when do_display = '1' else X"0000";
 end architecture arch;
