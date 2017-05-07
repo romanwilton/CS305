@@ -15,10 +15,10 @@ package util is
 	end record signals;
 	type signals_array is array (integer range <>) of signals;
 	
-	type two_digit_num is array (1 downto 0) of std_logic_vector(3 downto 0);
+	type N_digit_num is array (natural range <>) of std_logic_vector(3 downto 0);
 	
 	function string2char_array(str : string) return char_array;
-	function num2char_array(num : two_digit_num) return char_array;
+	function num2char_array(num : N_digit_num) return char_array;
 	
 end util;
 
@@ -42,10 +42,10 @@ package body util is
 		return output;
 	end string2char_array;
 	
-	function num2char_array(num : two_digit_num) return char_array is
-		variable output : char_array(1 downto 0);
+	function num2char_array(num : N_digit_num) return char_array is
+		variable output : char_array(num'length-1 downto 0);
 	begin
-		for i in 1 downto 0 loop
+		for i in num'length-1 downto 0 loop
 			output(i) := O"60" + num(i);
 		end loop;
 		return output;

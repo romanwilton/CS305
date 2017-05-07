@@ -5,9 +5,13 @@ use IEEE.numeric_std.all;
 use work.util.all;
 
 entity draw_score is
+	generic (
+		SCORE_N, STREAK_N : integer := 2
+	);
 	port(
 		clk : in std_logic;
-		score, streak : in two_digit_num;
+		score : in N_digit_num(SCORE_N-1 downto 0);
+		streak : in N_digit_num(STREAK_N-1 downto 0);
 		pixel_row, pixel_col : in std_logic_vector(9 downto 0);
 		colour_out : out std_logic_vector(15 downto 0)
 	);
@@ -65,7 +69,7 @@ begin
 	
 	LINE1 : draw_string 
 	generic map (
-		N => 11, x => 530, y => 10
+		N => 9+score'length, x => 530, y => 10
 	)
 	port map (
 		clk => clk,
@@ -79,7 +83,7 @@ begin
 	
 	LINE2 : draw_string 
 	generic map (
-		N => 11, x => 530, y => 20
+		N => 9+streak'length, x => 530, y => 20
 	)
 	port map (
 		clk => clk,
@@ -93,7 +97,7 @@ begin
 	
 	LINE1_NEXT : draw_string 
 	generic map (
-		N => 11, x => 530, y => 10
+		N => 9+score'length, x => 530, y => 10
 	)
 	port map (
 		clk => clk,
@@ -107,7 +111,7 @@ begin
 	
 	LINE2_NEXT : draw_string 
 	generic map (
-		N => 11, x => 530, y => 20
+		N => 9+streak'length, x => 530, y => 20
 	)
 	port map (
 		clk => clk,
