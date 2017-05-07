@@ -36,7 +36,7 @@ begin
 		if (rising_edge(clock)) then
 			if (move = '1') then
 				if enable_move = '1' then
-					y <= y - 8;
+					y <= y - 16;
 				end if;
 			else
 				x <= new_pos - 1;
