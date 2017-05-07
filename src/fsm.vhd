@@ -76,7 +76,6 @@ begin
 				state_indicator <= "0100";
 			when collided =>
 				increase_score <= '1';
-				ai_reset <= '1';
 				increase_streak <= '1';
 				state_indicator <= "1000";
 		end case;

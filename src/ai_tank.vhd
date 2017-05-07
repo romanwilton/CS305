@@ -5,7 +5,7 @@ use IEEE.numeric_std.all;
 
 entity ai_tank is
 	port (
-		clock, reset, hold, enable_move : IN std_logic;
+		clock, reset, respawn, hold, enable_move : IN std_logic;
 		pixel_row, pixel_col, new_pos, bullet_x_pos, bullet_y_pos : IN std_logic_vector(9 downto 0);
 		collision	: OUT std_logic;
 		RGB_out	: OUT std_logic_vector(15 downto 0)
@@ -19,6 +19,7 @@ architecture arch of ai_tank is
 	signal x : std_logic_vector(9 downto 0);
 	signal y : std_logic_vector(9 downto 0);
 	signal moveDir : std_logic := '0';
+	signal s_collision : std_logic;
 	constant intital_y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
 	component draw_object is
 		generic (
@@ -40,7 +41,7 @@ begin
 		variable x_var : std_logic_vector(9 downto 0);
 	begin
 		if (rising_edge(clock)) then
-			if(reset = '1') then
+			if (reset = '1' or (respawn = '1' and s_collision = '1')) then
 				-- Multiply by ~0.6 using (<<4 + <<1 + <<0)>>5
 				rand_in := unsigned(new_pos);
 				intermediate := std_logic_vector(("0"&rand_in&"0000") + ("0000"&rand_in&"0") + ("00000"&rand_in));
@@ -78,12 +79,14 @@ begin
 	begin
 		if(bullet_y_pos < y + height/2 AND bullet_y_pos > y - height/2) then
 			if(bullet_x_pos < x + width/2 AND bullet_x_pos + width/2 > x) then
-				collision <= '1';
+				s_collision <= '1';
 			else
-				collision <= '0';
+				s_collision <= '0';
 			end if;
 		else
-			collision <= '0';
+			s_collision <= '0';
 		end if;
 	end process ; -- collisions
+	
+	collision <= s_collision;
 end architecture arch;
