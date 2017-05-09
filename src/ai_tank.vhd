@@ -21,6 +21,29 @@ architecture arch of ai_tank is
 	constant width : natural := 50;
 	constant height : natural := 54;
 	constant intital_y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
+	
+	procedure reset_AI_tank (
+		signal new_pos : in std_logic_vector(9 downto 0);
+		constant intital_y : in std_logic_vector(9 downto 0);
+		variable rand_in : inout unsigned(9 downto 0);
+		variable intermediate : inout std_logic_vector(14 downto 0);
+		variable x_var : inout std_logic_vector(9 downto 0);
+		signal x, y : out std_logic_vector(9 downto 0);
+		signal moveDir : out std_logic
+	) is
+	begin
+		-- Multiply by ~0.6 using (<<4 + <<1 + <<0)>>5
+		rand_in := unsigned(new_pos);
+		intermediate := std_logic_vector(("0"&rand_in&"0000") + ("0000"&rand_in&"0") + ("00000"&rand_in));
+		x_var := intermediate(14 downto 5);
+		x <= x_var;
+		y <= intital_y;
+		if x_var > 320 then
+			moveDir <= '1';
+		else
+			moveDir <= '0';
+		end if;
+	end procedure;
 
 	signal x : std_logic_vector(9 downto 0);
 	signal y : std_logic_vector(9 downto 0);
