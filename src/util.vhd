@@ -8,12 +8,12 @@ package util is
 	
 	type char_array is array (integer range <>) of std_logic_vector(5 downto 0);
 	
-	type signals is record
+	type char_signals is record
 		enable : std_logic;
 		character_address : STD_LOGIC_VECTOR (5 DOWNTO 0);
 		font_row, font_col : STD_LOGIC_VECTOR (2 DOWNTO 0);
-	end record signals;
-	type signals_array is array (integer range <>) of signals;
+	end record char_signals;
+	type char_signals_array is array (integer range <>) of char_signals;
 	
 	type N_digit_num is array (natural range <>) of std_logic_vector(3 downto 0);
 	

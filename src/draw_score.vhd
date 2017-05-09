@@ -23,7 +23,7 @@ architecture arch of draw_score is
 	signal row, col : STD_LOGIC_VECTOR (2 DOWNTO 0);
 	signal rom_out : std_logic;
 	
-	signal all_signals, next_pixel_signals : signals_array(1 downto 0);
+	signal all_signals, next_pixel_signals : char_signals_array(1 downto 0);
 	signal pixel_row_next, pixel_col_next : std_logic_vector(9 downto 0);
 
 begin
@@ -52,10 +52,7 @@ begin
 		clk => clk,
 		str => string2char_array(" SCORE = ") & num2char_array(score),
 		pixel_row => pixel_row, pixel_col => pixel_col,
-		enable => all_signals(0).enable,
-		character_address => all_signals(0).character_address,
-		font_row => all_signals(0).font_row,
-		font_col => all_signals(0).font_col
+		signals => all_signals(0)
 	);
 	
 	LINE2 : entity work.draw_string 
@@ -66,10 +63,7 @@ begin
 		clk => clk,
 		str => string2char_array("STREAK = ") & num2char_array(streak),
 		pixel_row => pixel_row, pixel_col => pixel_col,
-		enable => all_signals(1).enable,
-		character_address => all_signals(1).character_address,
-		font_row => all_signals(1).font_row,
-		font_col => all_signals(1).font_col
+		signals => all_signals(1)
 	);
 	
 	LINE1_NEXT : entity work.draw_string 
@@ -80,10 +74,7 @@ begin
 		clk => clk,
 		str => string2char_array(" SCORE = ") & num2char_array(score),
 		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
-		enable => next_pixel_signals(0).enable,
-		character_address => next_pixel_signals(0).character_address,
-		font_row => next_pixel_signals(0).font_row,
-		font_col => next_pixel_signals(0).font_col
+		signals => next_pixel_signals(0)
 	);
 	
 	LINE2_NEXT : entity work.draw_string 
@@ -94,10 +85,7 @@ begin
 		clk => clk,
 		str => string2char_array("STREAK = ") & num2char_array(streak),
 		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
-		enable => next_pixel_signals(1).enable,
-		character_address => next_pixel_signals(1).character_address,
-		font_row => next_pixel_signals(1).font_row,
-		font_col => next_pixel_signals(1).font_col
+		signals => next_pixel_signals(1)
 	);
 	
 	next_pixel : process (next_pixel_signals) is
