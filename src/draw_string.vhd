@@ -19,26 +19,13 @@ entity draw_string is
 end entity draw_string;
 
 architecture arch of draw_string is
-
-	component draw_character is
-		generic (
-			x, y : in natural
-		);
-		port (
-			char : in std_logic_vector(5 downto 0);
-			pixel_row, pixel_col : in std_logic_vector(9 downto 0);
-			enable : out std_logic;
-			character_address : OUT STD_LOGIC_VECTOR (5 DOWNTO 0);
-			font_row, font_col : OUT STD_LOGIC_VECTOR (2 DOWNTO 0)
-		);
-	end component draw_character;
 	
 	signal all_signals : signals_array((N-1) downto 0);
 
 begin
 
 	GEN : for i in (N-1) downto 0 generate
-		CHARACTER_DRAW : draw_character
+		CHARACTER_DRAW : entity work.draw_character
 		generic map (
 			x => x + (N-1-i)*8, y => y
 		)

@@ -15,25 +15,13 @@ entity draw_object is
 end entity draw_object;
 
 architecture arch of draw_object is
-
-	COMPONENT image_rom IS
-		generic (
-			image_path : string;
-			width, height : integer
-		);
-		PORT (
-			pixel_x, pixel_y, show_x, show_y	:	IN STD_LOGIC_VECTOR (9 DOWNTO 0);
-			clock								: 	IN STD_LOGIC;
-			RGB									:	OUT STD_LOGIC_VECTOR(15 downto 0)
-		);
-	END COMPONENT image_rom;
 	
 	signal RGB : std_logic_vector(15 downto 0);
 	signal pixel_x_in, pixel_y_in : STD_LOGIC_VECTOR (9 DOWNTO 0);
 
 begin
 
-	comp : image_rom
+	comp : entity work.image_rom
 		GENERIC MAP (image_path, width, height)
 		PORT MAP (pixel_x_in, pixel_y_in, x, y, clock, RGB);
 		

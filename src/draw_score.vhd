@@ -19,29 +19,6 @@ end entity draw_score;
 
 architecture arch of draw_score is
 	
-	component char_rom is
-		port (
-			character_address	:	IN STD_LOGIC_VECTOR (5 DOWNTO 0);
-			font_row, font_col	:	IN STD_LOGIC_VECTOR (2 DOWNTO 0);
-			clock				: 	IN STD_LOGIC ;
-			rom_mux_output		:	OUT STD_LOGIC
-		);
-	end component char_rom;
-	
-	component draw_string is
-		generic (
-			N, x, y : in natural
-		);
-		port (
-			clk : in std_logic;
-			str : in char_array(N-1 downto 0);
-			pixel_row, pixel_col : in std_logic_vector(9 downto 0);
-			enable : out std_logic;
-			character_address : OUT STD_LOGIC_VECTOR (5 DOWNTO 0);
-			font_row, font_col : OUT STD_LOGIC_VECTOR (2 DOWNTO 0)
-		);
-	end component draw_string;
-	
 	signal character_address : STD_LOGIC_VECTOR (5 DOWNTO 0);
 	signal row, col : STD_LOGIC_VECTOR (2 DOWNTO 0);
 	signal rom_out : std_logic;
@@ -65,9 +42,9 @@ begin
 		end if;
 	end process next_pixel_calc;
 
-	CHARACTER_ROM: char_rom port map (character_address, row, col, clk, rom_out);
+	CHARACTER_ROM: entity work.char_rom port map (character_address, row, col, clk, rom_out);
 	
-	LINE1 : draw_string 
+	LINE1 : entity work.draw_string 
 	generic map (
 		N => 9+score'length, x => 530, y => 10
 	)
@@ -81,7 +58,7 @@ begin
 		font_col => all_signals(0).font_col
 	);
 	
-	LINE2 : draw_string 
+	LINE2 : entity work.draw_string 
 	generic map (
 		N => 9+streak'length, x => 530, y => 20
 	)
@@ -95,7 +72,7 @@ begin
 		font_col => all_signals(1).font_col
 	);
 	
-	LINE1_NEXT : draw_string 
+	LINE1_NEXT : entity work.draw_string 
 	generic map (
 		N => 9+score'length, x => 530, y => 10
 	)
@@ -109,7 +86,7 @@ begin
 		font_col => next_pixel_signals(0).font_col
 	);
 	
-	LINE2_NEXT : draw_string 
+	LINE2_NEXT : entity work.draw_string 
 	generic map (
 		N => 9+streak'length, x => 530, y => 20
 	)

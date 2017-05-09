@@ -27,20 +27,8 @@ architecture arch of ai_tank is
 	signal moveDir : std_logic := '0';
 	signal s_collision, do_display : std_logic := '0';
 	signal RGB : std_logic_vector(15 downto 0);
-	
-	component draw_object is
-		generic (
-			image_path : string;
-			width, height : integer
-		);
-		port (
-			clock : IN std_logic;
-			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
-			RGB_out	: OUT std_logic_vector(15 downto 0)
-		);
-	end component draw_object;
 begin
-	output_drawing : draw_object generic map (IMAGE, width, height) port map(clock, pixel_row, pixel_col, x, y, RGB);
+	output_drawing : entity work.draw_object generic map (IMAGE, width, height) port map(clock, pixel_row, pixel_col, x, y, RGB);
 
 	movement : process (clock) is
 		variable rand_in : unsigned(9 downto 0);

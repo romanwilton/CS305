@@ -16,19 +16,8 @@ architecture arch of background is
 	signal x : std_logic_vector(9 downto 0);
 	signal y : std_logic_vector(9 downto 0);
 	signal row, col: integer;
-	component draw_object is
-		generic (
-			image_path : string;
-			width, height : integer
-		);
-		port (
-			clock : IN std_logic;
-			pixel_row, pixel_col, x, y : IN std_logic_vector(9 downto 0);
-			RGB_out	: OUT std_logic_vector(15 downto 0)
-		);
-	end component draw_object;
 begin
-	output_drawing : draw_object generic map ("images/grass.mif", 90, 90) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : entity work.draw_object generic map ("images/grass.mif", 90, 90) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 	col <=
 		0 when pixel_row >= 0 AND pixel_row < 90 else
