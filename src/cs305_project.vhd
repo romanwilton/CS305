@@ -22,7 +22,7 @@ architecture arch of cs305_project is
 	constant N_SCORE : integer := 3;
 	constant N_STREAK : integer := 2;
 	type string_array is array (0 to N_AI_TANK-1) of string(1 to 21);
-	constant AI_IMAGES : string_array := ("images/enemyTank1.mif", "images/enemyTank1.mif", "images/enemyTank2.mif");
+	constant AI_IMAGES : string_array := ("images/enemyTank1.mif", "images/enemyTank2.mif", "images/enemyTank3.mif");
 
 --Component description begins
 
