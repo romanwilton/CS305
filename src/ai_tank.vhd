@@ -5,6 +5,9 @@ use IEEE.numeric_std.all;
 use work.util.all;
 
 entity ai_tank is
+	generic (
+		SPEED : in natural := 3
+	);
 	port (
 		clock, reset, respawn, hold, enable_move : IN std_logic;
 		pixel_row, pixel_col, new_pos, bullet_x_pos, bullet_y_pos : IN std_logic_vector(9 downto 0);
@@ -61,9 +64,9 @@ begin
 				end if;
 
 				if(moveDir = '0') then
-					x <= x+3;
+					x <= x + SPEED;
 				else
-					x <= x-3; 	
+					x <= x - SPEED; 	
 				end if; 
 
 				if(y >= std_logic_vector(to_unsigned(420, 10))) then

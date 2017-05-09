@@ -95,6 +95,9 @@ architecture arch of cs305_project is
 	end component user_tank;
 
 	component ai_tank is
+		generic (
+			SPEED : in natural := 3
+		);
 		port (
 			clock, reset, respawn, hold, enable_move : IN std_logic;
 			pixel_row, pixel_col, new_pos, bullet_x_pos, bullet_y_pos : IN std_logic_vector(9 downto 0);
@@ -187,8 +190,8 @@ begin
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	UserTank : user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(3));
 	UserBullet : bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(2));
-	AiTank : ai_tank port map(divided_clk, ai_reset, increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision1, win1, layers(0));
-	AiTank2 : ai_tank port map(divided_clk, delay_out, increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision2, win2, layers(1));
+	AiTank : ai_tank generic map (3) port map(divided_clk, ai_reset, increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision1, win1, layers(0));
+	AiTank2 : ai_tank generic map (5) port map(divided_clk, delay_out, increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision2, win2, layers(1));
 	LayerControl : layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
 	DisplayControl : VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col);
 	DelayControl : delay port map (divided_clk, delay_in, delay_out);
