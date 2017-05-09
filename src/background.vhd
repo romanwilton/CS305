@@ -1,8 +1,7 @@
 LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
-use IEEE.numeric_std.all;
-
+use IEEE.std_logic_arith.all;
 
 entity background is
 	port (
@@ -17,7 +16,8 @@ architecture arch of background is
 	signal y : std_logic_vector(9 downto 0);
 	signal row, col: integer;
 begin
-	output_drawing : entity work.draw_object generic map ("images/grass.mif", 90, 90) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : entity work.draw_object generic map ("images/grass.mif", 90, 90) 
+		port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 	col <=
 		0 when pixel_row >= 0 AND pixel_row < 90 else
@@ -39,7 +39,7 @@ begin
 		6 when pixel_col >= 540 AND pixel_col < 630 else
 		7 when pixel_col >= 630 AND pixel_col < 720;
 
-	x <= std_logic_vector(to_unsigned((45 + 90 * row), 10));
-	y <= std_logic_vector(to_unsigned((45 + 90 * col), 10));
+	x <= CONV_STD_LOGIC_VECTOR(45 + 90 * row, 10);
+	y <= CONV_STD_LOGIC_VECTOR(45 + 90 * col, 10);
 
 end architecture arch;

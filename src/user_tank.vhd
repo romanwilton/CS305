@@ -1,7 +1,7 @@
 LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
-use IEEE.numeric_std.all;
+use IEEE.std_logic_arith.all;
 
 entity user_tank is
 	port (
@@ -16,8 +16,9 @@ architecture arch of user_tank is
 	signal x : std_logic_vector(9 downto 0);
 	signal y : std_logic_vector(9 downto 0);
 begin
-	y <= std_logic_vector(to_unsigned(420, 10));
-	output_drawing : entity work.draw_object generic map ("images/tank.mif", 50, 54) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	y <= CONV_STD_LOGIC_VECTOR(420, 10);
+	output_drawing : entity work.draw_object generic map ("images/tank.mif", 50, 54) 
+		port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 	clockDriven : process(clock, enable_move) is
 	begin
 		if (rising_edge(clock) and enable_move = '1') then

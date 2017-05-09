@@ -1,7 +1,7 @@
 LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
-use IEEE.numeric_std.all;
+use IEEE.std_logic_arith.all;
 
 package util is
 	type pixel is array (integer range <>) of std_logic_vector(15 downto 0);
@@ -36,7 +36,7 @@ package body util is
 				when ' ' => 
 					output(str'length-i) := O"40";
 				when others =>
-					temp := std_logic_vector(to_unsigned(character'pos(str(i)), 10) - to_unsigned(64, 10));
+					temp := CONV_STD_LOGIC_VECTOR(character'pos(str(i)) - 64, 10);
 					output(str'length-i) := temp(5 downto 0);
 			end case;
 		end loop;

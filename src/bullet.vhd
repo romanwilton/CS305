@@ -1,7 +1,7 @@
 LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
-use IEEE.numeric_std.all;
+use IEEE.std_logic_arith.all;
 
 entity bullet is
 	port (
@@ -18,7 +18,8 @@ architecture arch of bullet is
 	signal y : std_logic_vector(9 downto 0);
 	constant default_y : integer := 427;
 begin
-	output_drawing : entity work.draw_object generic map ("images/bullet.mif", 6, 8) port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	output_drawing : entity work.draw_object generic map ("images/bullet.mif", 6, 8) 
+		port map(clock, pixel_row, pixel_col, x, y, RGB_out);
 
 	position_logic : process (clock) is
 	begin
@@ -29,7 +30,7 @@ begin
 				end if;
 			else
 				x <= new_pos - 1;
-				y <= std_logic_vector(to_unsigned(default_y, 10));
+				y <= CONV_STD_LOGIC_VECTOR(default_y, 10);
 			end if;
 
 			if (y > 480) then

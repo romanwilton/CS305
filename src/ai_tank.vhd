@@ -1,7 +1,7 @@
 LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
-use IEEE.numeric_std.all;
+use IEEE.std_logic_arith.all;
 use work.util.all;
 
 entity ai_tank is
@@ -20,12 +20,12 @@ end entity ai_tank;
 architecture arch of ai_tank is
 	constant width : natural := 50;
 	constant height : natural := 54;
-	constant intital_y : std_logic_vector(9 downto 0) := std_logic_vector(to_unsigned(80, 10));
+	constant intital_y : std_logic_vector(9 downto 0) := CONV_STD_LOGIC_VECTOR(80, 10);
 	
 	procedure reset_AI_tank (
 		signal new_pos : in std_logic_vector(9 downto 0);
 		constant intital_y : in std_logic_vector(9 downto 0);
-		variable rand_in : inout unsigned(9 downto 0);
+		variable rand_in : inout std_logic_vector(9 downto 0);
 		variable intermediate : inout std_logic_vector(14 downto 0);
 		variable x_var : inout std_logic_vector(9 downto 0);
 		signal x, y : out std_logic_vector(9 downto 0);
@@ -33,8 +33,8 @@ architecture arch of ai_tank is
 	) is
 	begin
 		-- Multiply by ~0.6 using (<<4 + <<1 + <<0)>>5
-		rand_in := unsigned(new_pos);
-		intermediate := std_logic_vector(("0"&rand_in&"0000") + ("0000"&rand_in&"0") + ("00000"&rand_in));
+		rand_in := new_pos;
+		intermediate := ("0"&rand_in&"0000") + ("0000"&rand_in&"0") + ("00000"&rand_in);
 		x_var := intermediate(14 downto 5);
 		x <= x_var;
 		y <= intital_y;
@@ -51,10 +51,11 @@ architecture arch of ai_tank is
 	signal s_collision, do_display : std_logic := '0';
 	signal RGB : std_logic_vector(15 downto 0);
 begin
-	output_drawing : entity work.draw_object generic map (IMAGE, width, height) port map(clock, pixel_row, pixel_col, x, y, RGB);
+	output_drawing : entity work.draw_object generic map (IMAGE, width, height) 
+		port map(clock, pixel_row, pixel_col, x, y, RGB);
 
 	movement : process (clock) is
-		variable rand_in : unsigned(9 downto 0);
+		variable rand_in : std_logic_vector(9 downto 0);
 		variable intermediate : std_logic_vector(14 downto 0);
 		variable x_var : std_logic_vector(9 downto 0);
 	begin
@@ -67,10 +68,10 @@ begin
 			end if;
 			if (enable_move = '1' AND hold = '0') then
 				
-				if (x >= std_logic_vector(to_unsigned(640, 10))) and (x <= std_logic_vector(to_unsigned(650, 10))) then
+				if (x >= CONV_STD_LOGIC_VECTOR(640, 10)) and (x <= CONV_STD_LOGIC_VECTOR(650, 10)) then
 					y <= y + 20;
 					moveDir <= '1';
-				elsif (x >= std_logic_vector(to_unsigned(800, 10))) then
+				elsif (x >= CONV_STD_LOGIC_VECTOR(800, 10)) then
 					moveDir <= '0';
 					y <= y + 20;
 				end if;
@@ -81,7 +82,7 @@ begin
 					x <= x - SPEED; 	
 				end if; 
 
-				if(y >= std_logic_vector(to_unsigned(420, 10))) then
+				if(y >= CONV_STD_LOGIC_VECTOR(420, 10)) then
 					win <= '1';
 					reset_AI_tank(new_pos, intital_y, rand_in, intermediate, x_var, x, y, moveDir);
 				else
