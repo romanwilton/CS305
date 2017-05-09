@@ -61,10 +61,7 @@ begin
 
 	process (all_signals) is
 	begin
-		signals.enable <= '0';
-		signals.character_address <= O"00";
-		signals.font_row <= "000";
-		signals.font_col <= "000";
+		signals <= char_signals_zero;
 		for i in (N-1) downto 0 loop
 			if all_signals(i).enable = '1' then
 				signals <= all_signals(i);				
@@ -74,10 +71,7 @@ begin
 	
 	process (all_next_signals) is
 	begin
-		next_signals.enable <= '0';
-		next_signals.character_address <= O"00";
-		next_signals.font_row <= "000";
-		next_signals.font_col <= "000";
+		next_signals <= char_signals_zero;
 		for i in (N-1) downto 0 loop
 			if all_next_signals(i).enable = '1' then
 				next_signals <= all_next_signals(i);				

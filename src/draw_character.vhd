@@ -21,12 +21,7 @@ begin
 	process (pixel_col, pixel_row, char) is
 		variable col_v, row_v : STD_LOGIC_VECTOR(9 DOWNTO 0);
 	begin
-		
-		signals.enable <= '0';
-		signals.character_address <= "000000";
-		signals.font_row <= "000";
-		signals.font_col <= "000";
-	
+		signals <= char_signals_zero;
 		if (pixel_col >= x and pixel_col < (x + 8)) then
 			if (pixel_row >= y and pixel_row < (y + 8)) then
 				signals.character_address <= char;
