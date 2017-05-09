@@ -4,14 +4,14 @@ use IEEE.std_logic_unsigned.all;
 
 entity fsm is
 	port (
-		clock, btn_1, left_btn, right_btn, off_screen, collision : IN std_logic;
-		bullet_shot, ai_reset, ai_hold, increase_score, increase_streak : OUT std_logic;
+		clock, btn_1, left_btn, right_btn, off_screen, collision, win : IN std_logic;
+		bullet_shot, ai_reset, ai_hold, ai_respawn, increase_score, increase_streak : OUT std_logic;
 		state_indicator : OUT std_logic_vector(3 downto 0)
 	);
 end entity fsm;
 
 architecture arch of fsm is
-	type states is (start, hold, not_shot, shot, collided);
+	type states is (start, hold, not_shot, shot, collided, ai_win);
 	signal state : states := start;
 	signal next_state : states;
 begin
@@ -23,7 +23,7 @@ begin
 		end if;
 	end process progress_state;
 
-	next_state_logic : process (state, btn_1, left_btn, right_btn, off_screen, collision) is
+	next_state_logic : process (state, btn_1, left_btn, right_btn, off_screen, collision, win) is
 	begin
 		case state is
 			when start =>
@@ -37,6 +37,8 @@ begin
 			when not_shot =>
 				if (left_btn = '1') then
 					next_state <= shot;
+				elsif(win = '1') then
+					next_state <= ai_win;
 				else
 					next_state <= not_shot;
 				end if;
@@ -50,6 +52,8 @@ begin
 				end if;
 			when collided =>
 				next_state <= not_shot;
+			when ai_win =>
+				next_state <= not_shot;
 		end case;
 	end process next_state_logic;
 	
@@ -59,7 +63,9 @@ begin
 		increase_score <= '0';
 		ai_reset <= '0';
 		ai_hold <= '0';
+		ai_respawn <= '0';
 		increase_streak <= '0';
+
 
 		case state is
 			when start =>
@@ -72,12 +78,14 @@ begin
 				state_indicator <= "0010";
 			when shot =>
 				bullet_shot <= '1';
-
 				state_indicator <= "0100";
 			when collided =>
 				increase_score <= '1';
 				increase_streak <= '1';
-				state_indicator <= "1000";
+				state_indicator <= "0101";
+			when ai_win =>
+				ai_respawn <= '1';
+				state_indicator <= "0110";
 		end case;
 	end process output_logic;
 

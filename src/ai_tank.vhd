@@ -2,12 +2,13 @@ LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
+use work.util.all;
 
 entity ai_tank is
 	port (
 		clock, reset, respawn, hold, enable_move : IN std_logic;
 		pixel_row, pixel_col, new_pos, bullet_x_pos, bullet_y_pos : IN std_logic_vector(9 downto 0);
-		collision	: OUT std_logic;
+		collision, win	: OUT std_logic;
 		RGB_out	: OUT std_logic_vector(15 downto 0)
 	);
 end entity ai_tank;
@@ -46,20 +47,9 @@ begin
 			if (reset = '1' or (respawn = '1' and s_collision = '1')) then
 			
 				do_display <= '1';
-			
-				-- Multiply by ~0.6 using (<<4 + <<1 + <<0)>>5
-				rand_in := unsigned(new_pos);
-				intermediate := std_logic_vector(("0"&rand_in&"0000") + ("0000"&rand_in&"0") + ("00000"&rand_in));
-				x_var := intermediate(14 downto 5);
-				x <= x_var;
-				y <= intital_y;
-				if x_var > 320 then
-					moveDir <= '1';
-				else
-					moveDir <= '0';
-				end if; 
+				reset_AI_tank(new_pos, intital_y, rand_in, intermediate, x_var, x, y, moveDir);
+				
 			end if;
-
 			if (enable_move = '1' AND hold = '0') then
 				
 				if (x >= std_logic_vector(to_unsigned(640, 10))) and (x <= std_logic_vector(to_unsigned(650, 10))) then
@@ -75,7 +65,13 @@ begin
 				else
 					x <= x-3; 	
 				end if; 
-				
+
+				if(y >= std_logic_vector(to_unsigned(420, 10))) then
+					win <= '1';
+					reset_AI_tank(new_pos, intital_y, rand_in, intermediate, x_var, x, y, moveDir);
+				else
+					win <= '0';
+				end if;
 			end if;
 		end if;
 	end process ; -- movement
