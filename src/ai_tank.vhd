@@ -6,6 +6,7 @@ use work.util.all;
 
 entity ai_tank is
 	generic (
+		IMAGE : in string := "images/enemyTank.mif";
 		SPEED : in natural := 3
 	);
 	port (
@@ -39,7 +40,7 @@ architecture arch of ai_tank is
 		);
 	end component draw_object;
 begin
-	output_drawing : draw_object generic map ("images/enemyTank.mif", width, height) port map(clock, pixel_row, pixel_col, x, y, RGB);
+	output_drawing : draw_object generic map (IMAGE, width, height) port map(clock, pixel_row, pixel_col, x, y, RGB);
 
 	movement : process (clock) is
 		variable rand_in : unsigned(9 downto 0);
