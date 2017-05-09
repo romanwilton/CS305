@@ -17,7 +17,8 @@ end entity cs305_project;
 
 architecture arch of cs305_project is
 
-	constant NUM_LAYERS : integer := 6;
+	constant N_AI_TANK : integer := 3;
+	constant NUM_LAYERS : integer := 4 + N_AI_TANK;
 	constant N_SCORE : integer := 3;
 	constant N_STREAK : integer := 2;
 
@@ -155,6 +156,9 @@ architecture arch of cs305_project is
 	end component debounce;
 	
 	component delay is
+		generic(
+			DELAY_MS : in integer
+		);
 		port(
 			clk, input : in std_logic;
 			output : out std_logic
@@ -164,7 +168,7 @@ architecture arch of cs305_project is
 --Component description ends
 
 	signal divided_clk, left_button, shoot_signal, right_button : std_logic;
-	signal off_screen, collision1, collision2, bullet_shot : std_logic;
+	signal off_screen, bullet_shot : std_logic;
 	signal increase_score, increase_streak : std_logic;
 	signal ai_reset, ai_hold, ai_respawn : std_logic;
 	signal mouse_x_location, random_pos, user_location : std_logic_vector(9 downto 0);
@@ -173,36 +177,50 @@ architecture arch of cs305_project is
 	signal layers : pixel(NUM_LAYERS-1 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
 	signal not_bt2, enable_move : std_logic;
-	signal delay_in, delay_out : std_logic;
-	signal win1, win2 : std_logic;
 	signal current_score : N_digit_num(N_SCORE-1 downto 0);
 	signal streak_score : N_digit_num(N_STREAK-1 downto 0);
+	signal collision, win : std_logic := '0';
+	signal delays_out, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
 
 begin
 	ClockDivider : clock_div port map(clk, divided_clk);
 	MouseController : MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, open, mouse_x_location);
 	MouseDebouncer : debounce port map(divided_clk, left_button, shoot_signal);
-	StateMachine : fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision1 or collision2, win1 or win2, bullet_shot, ai_reset, ai_hold, ai_respawn, increase_score, increase_streak, state_ind);
+	StateMachine : fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision, win, bullet_shot, ai_reset, ai_hold, ai_respawn, increase_score, increase_streak, state_ind);
 	SevenSegDecoder1 : dec_7seg port map(current_score(0), seg0);
 	SevenSegDecoder2 : dec_7seg port map(current_score(1), seg1);
 	SevenSegDecoder3 : dec_7seg port map(current_score(2), seg2);
 	SevenSegDecoder4 : dec_7seg port map("0000", seg3);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
-	UserTank : user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(3));
-	UserBullet : bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(2));
-	AiTank : ai_tank generic map (3) port map(divided_clk, ai_reset, increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision1, win1, layers(0));
-	AiTank2 : ai_tank generic map (5) port map(divided_clk, delay_out, increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collision2, win2, layers(1));
+	UserTank : user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+1));
+	UserBullet : bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(N_AI_TANK+0));
 	LayerControl : layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
 	DisplayControl : VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col);
-	DelayControl : delay port map (divided_clk, delay_in, delay_out);
-	DrawScore : draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, pixel_row, pixel_col, layers(4));
-	BackgorundImage : background port map (divided_clk, pixel_row, pixel_col, layers(5));
+	DrawScore : draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, pixel_row, pixel_col, layers(N_AI_TANK+2));
+	BackgorundImage : background port map (divided_clk, pixel_row, pixel_col, layers(N_AI_TANK+3));
 	ScoreCounter : counter generic map (N_SCORE) port map(divided_clk, increase_score, '0', current_score);
 	StreakCounter : counter generic map (N_STREAK) port map(divided_clk, increase_streak, off_screen OR ai_respawn, streak_score);
+	
+	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
+		AiTank : ai_tank generic map ((i+1)*2) port map (divided_clk, delays_out(i), increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
+		DelayControl : delay generic map (1000 + 2000*i) port map (divided_clk, ai_reset, delays_out(i));
+	end generate TANK_GEN;
+	
+	process (collisions_out, wins_out) is
+		variable win_new, collision_new : std_logic := '0';
+	begin
+		win_new := '0';
+		collision_new := '0';
+		for i in 0 to N_AI_TANK-1 loop
+			collision_new := collisions_out(i) or collision_new;
+			win_new := wins_out(i) or win_new;
+		end loop;
+		win <= win_new;
+		collision <= collision_new;
+	end process;
 	
 	not_bt2 <= NOT bt2;
 	btn_1 <= NOT bt2;
 	left_btn <= shoot_signal;
-	delay_in <= ai_reset;
 	
 end architecture arch;

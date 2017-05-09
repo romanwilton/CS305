@@ -4,14 +4,17 @@ use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
 
 entity delay is
+	generic(
+		DELAY_MS : in integer
+	);
 	port(
 		clk, input : in std_logic;
 		output : out std_logic
 	);
 end entity;
 
--- Delay of 4s with 25MHz
 architecture arch of delay is
+	constant COUNTER_MAX : integer := 25000*DELAY_MS;
 begin
 	process (clk) is
 		variable count : integer := 0;
@@ -27,7 +30,7 @@ begin
 				count := count + 1;
 			end if;
 			
-			if count = 100000000 then
+			if count = COUNTER_MAX then
 				output <= '1';
 				count := 0;
 				enable := '0';
