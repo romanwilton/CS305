@@ -24,23 +24,8 @@ architecture arch of draw_score is
 	signal rom_out : std_logic;
 	
 	signal all_signals, next_pixel_signals : char_signals_array(1 downto 0);
-	signal pixel_row_next, pixel_col_next : std_logic_vector(9 downto 0);
 
 begin
-
-	next_pixel_calc : process (pixel_row, pixel_col) is
-	begin
-		if (pixel_row = "0111100000") then --480
-			pixel_col_next <= "0000000000";
-			pixel_row_next <= "0000000000";
-		elsif (pixel_col = "1001111111") then --639
-			pixel_col_next <= "0000000000";
-			pixel_row_next <= pixel_row + 1;
-		else
-			pixel_col_next <= pixel_col + 1;
-			pixel_row_next <= pixel_row;
-		end if;
-	end process next_pixel_calc;
 
 	CHARACTER_ROM: entity work.char_rom port map (character_address, row, col, clk, rom_out);
 	
@@ -52,7 +37,7 @@ begin
 		clk => clk,
 		str => string2char_array(" SCORE = ") & num2char_array(score),
 		pixel_row => pixel_row, pixel_col => pixel_col,
-		signals => all_signals(0)
+		signals => all_signals(0), next_signals => next_pixel_signals(0)
 	);
 	
 	LINE2 : entity work.draw_string 
@@ -63,29 +48,7 @@ begin
 		clk => clk,
 		str => string2char_array("STREAK = ") & num2char_array(streak),
 		pixel_row => pixel_row, pixel_col => pixel_col,
-		signals => all_signals(1)
-	);
-	
-	LINE1_NEXT : entity work.draw_string 
-	generic map (
-		N => 9+score'length, x => 530, y => 10
-	)
-	port map (
-		clk => clk,
-		str => string2char_array(" SCORE = ") & num2char_array(score),
-		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
-		signals => next_pixel_signals(0)
-	);
-	
-	LINE2_NEXT : entity work.draw_string 
-	generic map (
-		N => 9+streak'length, x => 530, y => 20
-	)
-	port map (
-		clk => clk,
-		str => string2char_array("STREAK = ") & num2char_array(streak),
-		pixel_row => pixel_row_next, pixel_col => pixel_col_next,
-		signals => next_pixel_signals(1)
+		signals => all_signals(1), next_signals => next_pixel_signals(1)
 	);
 	
 	next_pixel : process (next_pixel_signals) is
