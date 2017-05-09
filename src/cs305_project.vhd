@@ -21,6 +21,8 @@ architecture arch of cs305_project is
 	constant NUM_LAYERS : integer := 4 + N_AI_TANK;
 	constant N_SCORE : integer := 3;
 	constant N_STREAK : integer := 2;
+	type string_array is array (0 to N_AI_TANK-1) of string(1 to 21);
+	constant AI_IMAGES : string_array := ("images/enemyTank1.mif", "images/enemyTank1.mif", "images/enemyTank2.mif");
 
 --Component description begins
 
@@ -97,6 +99,7 @@ architecture arch of cs305_project is
 
 	component ai_tank is
 		generic (
+			IMAGE : in string := "images/enemyTank.mif";
 			SPEED : in natural := 3
 		);
 		port (
@@ -202,7 +205,7 @@ begin
 	StreakCounter : counter generic map (N_STREAK) port map(divided_clk, increase_streak, off_screen OR ai_respawn, streak_score);
 	
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
-		AiTank : ai_tank generic map ((i+1)*2) port map (divided_clk, delays_out(i), increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
+		AiTank : ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, delays_out(i), increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
 		DelayControl : delay generic map (1000 + 2000*i) port map (divided_clk, ai_reset, delays_out(i));
 	end generate TANK_GEN;
 	
