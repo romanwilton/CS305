@@ -21,6 +21,8 @@ package util is
 	function string2char_array(str : string) return char_array;
 	function num2char_array(num : N_digit_num) return char_array;
 	
+	function or_gate(arr : std_logic_vector) return std_logic;
+	
 end util;
 
 package body util is
@@ -51,5 +53,15 @@ package body util is
 		end loop;
 		return output;
 	end num2char_array;
+	
+	function or_gate(arr : std_logic_vector) return std_logic is
+		variable temp : std_logic;
+	begin
+		temp := '0';
+		for i in arr'length-1 downto 0 loop
+			temp := temp or arr(i);
+		end loop;
+		return temp;
+	end or_gate;
 
 end package body util;

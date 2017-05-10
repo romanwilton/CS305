@@ -70,19 +70,8 @@ begin
 		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, delays_out(i), increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
 		DelayControl : entity work.delay generic map (1000 + 2000*i) port map (divided_clk, ai_reset, delays_out(i));
 	end generate TANK_GEN;
-	
-	process (collisions_out, wins_out) is
-		variable win_new, collision_new : std_logic := '0';
-	begin
-		win_new := '0';
-		collision_new := '0';
-		for i in 0 to N_AI_TANK-1 loop
-			collision_new := collisions_out(i) or collision_new;
-			win_new := wins_out(i) or win_new;
-		end loop;
-		win <= win_new;
-		collision <= collision_new;
-	end process;
+	collision <= or_gate(collisions_out);
+	win <= or_gate(wins_out);
 	
 	not_bt2 <= NOT bt2;
 	btn_1 <= NOT bt2;
