@@ -12,7 +12,12 @@ entity cs305_project is
 		state_ind : OUT std_logic_vector(3 downto 0);
 		red_out, green_out, blue_out : OUT std_logic_vector(3 downto 0);
 		seg0, seg1, seg2, seg3 : OUT std_logic_vector(6 downto 0);
-		audio_out : OUT std_logic
+		audio_out : OUT std_logic;
+		
+		-- FLASH
+		flash_address : out std_logic_vector(21 downto 0);
+		flash_data : in std_logic_vector(7 downto 0);
+		flash_byte_word_mode, flash_chip_enable, flash_output_enable, flash_reset, flash_write_enable, flash_write_protect : out std_logic
 	);
 end entity cs305_project;
 
@@ -53,9 +58,9 @@ begin
 	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, open, mouse_x_location);
 	MouseDebouncer : entity work.debounce port map(divided_clk, left_button, shoot_signal);
 	StateMachine : entity work.fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision, win, bullet_shot, ai_reset, ai_hold, ai_respawn, increase_score, increase_streak, state_ind);
-	SevenSegDecoder1 : entity work.dec_7seg port map(current_score(0), seg0);
-	SevenSegDecoder2 : entity work.dec_7seg port map(current_score(1), seg1);
-	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
+	SevenSegDecoder1 : entity work.dec_7seg port map(flash_data(3 downto 0), seg0);
+	SevenSegDecoder2 : entity work.dec_7seg port map(flash_data(7 downto 4), seg1);
+	SevenSegDecoder3 : entity work.dec_7seg port map("0000", seg2);
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+1));
@@ -78,5 +83,15 @@ begin
 	not_bt2 <= NOT bt2;
 	btn_1 <= NOT bt2;
 	left_btn <= shoot_signal;
+	
+	-- FLASH
+	flash_address(flash_address'length-1 downto 16) <= (others => '0');
+	flash_address(15 downto 0) <= X"1018"; -- should retrieve 0x78
+	flash_chip_enable <= '0';
+	flash_output_enable <= '0';
+	flash_write_enable <= '1';
+	flash_reset <= '1';
+	flash_write_protect <= '0';
+	flash_byte_word_mode <= '0'; -- byte mode
 	
 end architecture arch;

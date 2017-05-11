@@ -1,5 +1,6 @@
 import sys
 import wave
+from intelhex import IntelHex
 
 file_in = open(sys.argv[1], "rb")
 wr = wave.open(file_in)
@@ -11,6 +12,7 @@ if wr.getnchannels() != 1:
     raise "Must be mono audio"
 
 file_out = open(sys.argv[1].replace(".wav", ".mif"), "w")
+hex_dict = {}
 
 width = wr.getsampwidth()
 num_frames = 20000 #wr.getnframes()
@@ -32,5 +34,9 @@ for i in range(num_frames):
     data = int.from_bytes(frame, byteorder='little')
     output = data*130//maxi
     file_out.write("%04X:\t%02X;\n" % (i, output))
+    hex_dict[i] = output
 
 file_out.write("END;")
+
+ih = IntelHex(hex_dict)
+ih.write_hex_file(sys.argv[1].replace(".wav", ".hex"))
