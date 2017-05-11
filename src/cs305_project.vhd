@@ -71,7 +71,7 @@ begin
 	BackgorundImage : entity work.background port map (divided_clk, pixel_row, pixel_col, layers(N_AI_TANK+3));
 	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, increase_score, '0', current_score);
 	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, increase_streak, off_screen OR ai_respawn, streak_score);
-	AudioPWM : entity work.audio generic map ("audio/audio_test.mif", 20000) port map (divided_clk, audio_out);
+	AudioPWM : entity work.audio generic map ("audio/audio_test.mif", 1239040) port map (divided_clk, flash_data, audio_out, flash_address);
 	
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
 		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, delays_out(i), increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
@@ -85,8 +85,6 @@ begin
 	left_btn <= shoot_signal;
 	
 	-- FLASH
-	flash_address(flash_address'length-1 downto 16) <= (others => '0');
-	flash_address(15 downto 0) <= X"1018"; -- should retrieve 0x78
 	flash_chip_enable <= '0';
 	flash_output_enable <= '0';
 	flash_write_enable <= '1';

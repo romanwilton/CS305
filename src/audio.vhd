@@ -10,69 +10,19 @@ entity audio is
 		sound_length : integer
 	);
 	port (
-  		clock : IN std_logic;
-  		PWM : OUT std_logic
+		clock : IN std_logic;
+		data : IN std_logic_vector(7 downto 0);
+		PWM : OUT std_logic;
+		address : OUT std_logic_vector(21 downto 0)
 	);
 end entity ; -- audio
 
 architecture arch of audio is
 
-	constant ADDR_WIDTH : natural := integer(ceil(log2(real(sound_length))));
-
-	SIGNAL rom_data		: STD_LOGIC_VECTOR (7 DOWNTO 0);
 	SIGNAL duty			: STD_LOGIC_VECTOR (9 DOWNTO 0);
-	SIGNAL rom_address	: STD_LOGIC_VECTOR (ADDR_WIDTH-1 DOWNTO 0) := (others => '0');
-
-	COMPONENT altsyncram
-	GENERIC (
-		address_aclr_a			: STRING;
-		clock_enable_input_a	: STRING;
-		clock_enable_output_a	: STRING;
-		init_file				: STRING;
-		intended_device_family	: STRING;
-		lpm_hint				: STRING;
-		lpm_type				: STRING;
-		numwords_a				: NATURAL;
-		operation_mode			: STRING;
-		outdata_aclr_a			: STRING;
-		outdata_reg_a			: STRING;
-		widthad_a				: NATURAL;
-		width_a					: NATURAL;
-		width_byteena_a			: NATURAL
-	);
-	PORT (
-		clock0		: IN STD_LOGIC ;
-		address_a	: IN STD_LOGIC_VECTOR (ADDR_WIDTH-1 DOWNTO 0);
-		q_a			: OUT STD_LOGIC_VECTOR (7 DOWNTO 0)
-	);
-	END COMPONENT;
+	SIGNAL rom_address	: STD_LOGIC_VECTOR (21 downto 0) := (others => '0');
 
 begin
-	altsyncram_component : altsyncram
-	GENERIC MAP (
-		address_aclr_a => "NONE",
-		clock_enable_input_a => "BYPASS",
-		clock_enable_output_a => "BYPASS",
-		init_file => sound_path,
-		intended_device_family => "Cyclone III",
-		lpm_hint => "ENABLE_RUNTIME_MOD=NO",
-		lpm_type => "altsyncram",
-		numwords_a => sound_length,
-		operation_mode => "ROM",
-		outdata_aclr_a => "NONE",
-		outdata_reg_a => "UNREGISTERED",
-		widthad_a => ADDR_WIDTH,
-		width_a => 8,
-		width_byteena_a => 1
-	)
-	PORT MAP (
-		clock0 => clock,
-		address_a => rom_address,
-		q_a => rom_data
-	);
-
-	duty <= rom_data & "00";
-
 
 	PlaybackHandling : process( clock )
 		variable count : integer range 0 to 520;
@@ -86,6 +36,7 @@ begin
 			end if;
 
 			if(count = 520) then
+				duty <= data & "00";
 				if rom_address + 1 = sound_length then
 					rom_address <= (others => '0');
 				else
@@ -95,4 +46,7 @@ begin
 			end if;
 		end if;
 	end process ; -- PlaybackHandling
+	
+	address <= rom_address;
+	
 end architecture ; -- arch
