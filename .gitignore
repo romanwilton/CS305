@@ -1,6 +1,7 @@
 *
 !.gitignore
 !src/
+!audio/
 !images/
 !images/Source/
 !test/
@@ -17,3 +18,4 @@
 !*.tcl
 !*.ps1
 !*.pdn
+!*.wav
