@@ -2,6 +2,7 @@ LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.std_logic_arith.all;
+use IEEE.math_real.all;
 
 entity audio is
 	generic (
@@ -15,10 +16,12 @@ entity audio is
 end entity ; -- audio
 
 architecture arch of audio is
+
+	constant ADDR_WIDTH : natural := integer(ceil(log2(real(sound_length))));
+
 	SIGNAL rom_data		: STD_LOGIC_VECTOR (7 DOWNTO 0);
 	SIGNAL duty			: STD_LOGIC_VECTOR (9 DOWNTO 0);
-	SIGNAL rom_address	: STD_LOGIC_VECTOR (15 DOWNTO 0) := X"0000";
-
+	SIGNAL rom_address	: STD_LOGIC_VECTOR (ADDR_WIDTH-1 DOWNTO 0) := (others => '0');
 
 	COMPONENT altsyncram
 	GENERIC (
@@ -39,7 +42,7 @@ architecture arch of audio is
 	);
 	PORT (
 		clock0		: IN STD_LOGIC ;
-		address_a	: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+		address_a	: IN STD_LOGIC_VECTOR (ADDR_WIDTH-1 DOWNTO 0);
 		q_a			: OUT STD_LOGIC_VECTOR (7 DOWNTO 0)
 	);
 	END COMPONENT;
@@ -58,9 +61,9 @@ begin
 		operation_mode => "ROM",
 		outdata_aclr_a => "NONE",
 		outdata_reg_a => "UNREGISTERED",
-		widthad_a => 16,
+		widthad_a => ADDR_WIDTH,
 		width_a => 8,
-		width_byteena_a => 2
+		width_byteena_a => 1
 	)
 	PORT MAP (
 		clock0 => clock,
@@ -83,7 +86,12 @@ begin
 			end if;
 
 			if(count = 520) then
-				rom_address <= rom_address + 1;
+				if rom_address + 1 = sound_length then
+					rom_address <= (others => '0');
+				else
+					rom_address <= rom_address + 1;
+				end if;
+				count := 0;
 			end if;
 		end if;
 	end process ; -- PlaybackHandling

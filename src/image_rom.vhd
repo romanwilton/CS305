@@ -2,6 +2,7 @@ LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 USE IEEE.STD_LOGIC_UNSIGNED.all;
 USE IEEE.std_logic_arith.all;
+use IEEE.math_real.all;
 
 LIBRARY altera_mf;
 USE altera_mf.all;
@@ -20,8 +21,10 @@ END image_rom;
 
 ARCHITECTURE SYN OF image_rom IS
 
+	constant ADDR_WIDTH : natural := integer(ceil(log2(real(width*height))));
+
 	SIGNAL rom_data		: STD_LOGIC_VECTOR (15 DOWNTO 0);
-	SIGNAL rom_address	: STD_LOGIC_VECTOR (15 DOWNTO 0);
+	SIGNAL rom_address	: STD_LOGIC_VECTOR (ADDR_WIDTH-1 DOWNTO 0);
 
 	COMPONENT altsyncram
 	GENERIC (
@@ -42,7 +45,7 @@ ARCHITECTURE SYN OF image_rom IS
 	);
 	PORT (
 		clock0		: IN STD_LOGIC ;
-		address_a	: IN STD_LOGIC_VECTOR (15 DOWNTO 0);
+		address_a	: IN STD_LOGIC_VECTOR (ADDR_WIDTH-1 DOWNTO 0);
 		q_a			: OUT STD_LOGIC_VECTOR (15 DOWNTO 0)
 	);
 	END COMPONENT;
@@ -61,7 +64,7 @@ BEGIN
 		operation_mode => "ROM",
 		outdata_aclr_a => "NONE",
 		outdata_reg_a => "UNREGISTERED",
-		widthad_a => 16,
+		widthad_a => ADDR_WIDTH,
 		width_a => 16,
 		width_byteena_a => 2
 	)
@@ -79,9 +82,9 @@ BEGIN
 		y := pixel_y + height/2 - show_y;
 		address_temp := y + x(7 downto 0)*CONV_STD_LOGIC_VECTOR(height, 8);
 		if address_temp < width*height then
-			rom_address <= address_temp;
+			rom_address <= address_temp(ADDR_WIDTH-1 downto 0);
 		else
-			rom_address <= X"0000";
+			rom_address <= (others => '0');
 		end if;
 	end process;
 	

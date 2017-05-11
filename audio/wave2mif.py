@@ -32,3 +32,5 @@ for i in range(num_frames):
     data = int.from_bytes(frame, byteorder='little')
     output = data*130//maxi
     file_out.write("%04X:\t%02X;\n" % (i, output))
+
+file_out.write("END;")
