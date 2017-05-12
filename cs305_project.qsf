@@ -183,6 +183,7 @@ set_location_assignment PIN_V2 -to flash_data[4]
 set_location_assignment PIN_V3 -to flash_data[5]
 set_location_assignment PIN_W1 -to flash_data[6]
 set_location_assignment PIN_Y1 -to flash_data[7]
+set_location_assignment PIN_Y2 -to flash_data_15
 set_location_assignment PIN_AA1 -to flash_byte_word_mode
 set_location_assignment PIN_N8 -to flash_chip_enable
 set_location_assignment PIN_R6 -to flash_output_enable

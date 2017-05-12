@@ -21,6 +21,6 @@ for i in range(num_frames):
     frame = raw_frames[i*width:(i+1)*width]
     data = int.from_bytes(frame, byteorder='little')
     output = data*130//maxi
-    hex_out.write("%04X" % (output))
+    hex_out.write("%02X" % (output))
 
 hex_out.close()

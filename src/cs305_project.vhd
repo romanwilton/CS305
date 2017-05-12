@@ -17,13 +17,14 @@ entity cs305_project is
 		-- FLASH
 		flash_address : out std_logic_vector(21 downto 0);
 		flash_data : in std_logic_vector(7 downto 0);
+		flash_data_15 : out std_logic;
 		flash_byte_word_mode, flash_chip_enable, flash_output_enable, flash_reset, flash_write_enable, flash_write_protect : out std_logic
 	);
 end entity cs305_project;
 
 architecture arch of cs305_project is
 
-	constant N_AI_TANK : integer := 2;
+	constant N_AI_TANK : integer := 3;
 	constant NUM_LAYERS : integer := 4 + N_AI_TANK;
 	constant N_SCORE : integer := 3;
 	constant N_STREAK : integer := 2;
@@ -52,15 +53,16 @@ architecture arch of cs305_project is
 	signal streak_score : N_digit_num(N_STREAK-1 downto 0);
 	signal collision, win : std_logic := '0';
 	signal delays_out, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
+	signal s_flash_address : std_logic_vector(21 downto 0);
 
 begin
 	ClockDivider : entity work.clock_div port map(clk, divided_clk);
 	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, open, mouse_x_location);
 	MouseDebouncer : entity work.debounce port map(divided_clk, left_button, shoot_signal);
 	StateMachine : entity work.fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision, win, bullet_shot, ai_reset, ai_hold, ai_respawn, increase_score, increase_streak, state_ind);
-	SevenSegDecoder1 : entity work.dec_7seg port map(flash_data(3 downto 0), seg0);
-	SevenSegDecoder2 : entity work.dec_7seg port map(flash_data(7 downto 4), seg1);
-	SevenSegDecoder3 : entity work.dec_7seg port map("0000", seg2);
+	SevenSegDecoder1 : entity work.dec_7seg port map(current_score(0), seg0);
+	SevenSegDecoder2 : entity work.dec_7seg port map(current_score(1), seg1);
+	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+1));
@@ -71,7 +73,7 @@ begin
 	BackgorundImage : entity work.background port map (divided_clk, pixel_row, pixel_col, layers(N_AI_TANK+3));
 	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, increase_score, '0', current_score);
 	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, increase_streak, off_screen OR ai_respawn, streak_score);
-	AudioPWM : entity work.audio generic map ("audio/audio_test.mif", 1239040) port map (divided_clk, flash_data, audio_out, flash_address);
+	AudioPWM : entity work.audio generic map ("audio/audio_test.mif", 1239040) port map (divided_clk, flash_data, audio_out, s_flash_address);
 	
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
 		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, delays_out(i), increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
@@ -85,6 +87,8 @@ begin
 	left_btn <= shoot_signal;
 	
 	-- FLASH
+	flash_address <= "0" & s_flash_address(21 downto 1);
+	flash_data_15 <= s_flash_address(0);
 	flash_chip_enable <= '0';
 	flash_output_enable <= '0';
 	flash_write_enable <= '1';
