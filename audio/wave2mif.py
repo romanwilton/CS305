@@ -24,3 +24,6 @@ for i in range(num_frames):
     hex_out.write("%02X" % (output))
 
 hex_out.close()
+
+print("%d bytes" % (num_frames))
+print("%dkB of data used" % (num_frames//1000))
