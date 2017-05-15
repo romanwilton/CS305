@@ -36,7 +36,7 @@ begin
 			end if;
 
 			if(count = 520) then
-				duty <= data & "00";
+				duty <= "00" & data;
 				if rom_address + 1 = sound_length then
 					rom_address <= (others => '0');
 				else
