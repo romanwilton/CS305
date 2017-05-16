@@ -5,7 +5,7 @@ use work.util.all;
 
 entity cs305_project is
 	port (
-		clk, bt2 : IN std_logic;
+		clk, bt1, bt2 : IN std_logic;
 		mouse_data, mouse_clk : INOUT std_logic;
 		led : OUT std_logic_vector(9 downto 0);
 		horiz_sync_out, vert_sync_out : OUT std_logic;
@@ -47,11 +47,11 @@ architecture arch of cs305_project is
 	signal bullet_y_pos, bullet_x_pos : std_logic_vector(9 downto 0);
 	signal layers : pixel(NUM_LAYERS-1 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
-	signal not_bt2, enable_move : std_logic;
+	signal not_bt2, not_bt1, enable_move : std_logic;
 	signal current_score : N_digit_num(N_SCORE-1 downto 0);
 	signal streak_score : N_digit_num(N_STREAK-1 downto 0);
 	signal bullet_collision, ai_win : std_logic := '0';
-	signal delays_out, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
+	signal start_tank, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
 	signal s_flash_address : std_logic_vector(21 downto 0);
 	signal health : integer range 0 to 3 := 3;
 	signal playClick, trainClick : std_logic;
@@ -94,11 +94,11 @@ begin
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
-		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, delays_out(i), ai_reset, ai_respawn, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
+		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
 	end generate TANK_GEN;
 
 	red_out <= "1111" when showMenu = '1' else temp_red_out;
-	playClick <= not_bt2;
+	playClick <= not_bt1;
 	trainClick <= '0';
 	playerDie <= '1' when health = 0 else '0';
 
@@ -108,28 +108,29 @@ begin
 		if(rising_edge(divided_clk)) then
 			if not (level = oldLevel) then
 				if level = "11" then
-					delays_out(0) <= '0';
-					delays_out(1) <= '0';
-					delays_out(2) <= '1';
+					start_tank(0) <= '0';
+					start_tank(1) <= '0';
+					start_tank(2) <= '1';
 				elsif level = "10" then
-					delays_out(0) <= '0';
-					delays_out(1) <= '1';
-					delays_out(2) <= '0';
+					start_tank(0) <= '0';
+					start_tank(1) <= '1';
+					start_tank(2) <= '0';
 				elsif level = "01" then
-					delays_out(0) <= '1';
-					delays_out(1) <= '0';
-					delays_out(2) <= '0';
+					start_tank(0) <= '1';
+					start_tank(1) <= '0';
+					start_tank(2) <= '0';
 				end if;
 				oldLevel := level;
 			else
-				delays_out(0) <= '0';
-				delays_out(1) <= '0';
-				delays_out(2) <= '0';
+				start_tank(0) <= '0';
+				start_tank(1) <= '0';
+				start_tank(2) <= '0';
 			end if;
 		end if;
 	end process ; -- awfulHardcodedRubbish
 
-	TEMP_FUCK_OFF : process( divided_clk )
+
+	rightClickRisingEdge : process( divided_clk )
 		variable oldvalue : std_logic;
 	begin
 		if(rising_edge(divided_clk)) then
@@ -140,7 +141,7 @@ begin
 				playerWin <= '0';
 			end if;
 		end if;
-	end process ; -- TEMP_FUCK_OFF
+	end process ; -- rightClickRisingEdge
 
 	
 
@@ -149,6 +150,7 @@ begin
 	ai_win <= or_gate(wins_out);
 	
 	not_bt2 <= NOT bt2;
+	not_bt1 <= NOT bt1;
 	led(9) <= NOT bt2;
 	led(0) <= shoot_signal;
 

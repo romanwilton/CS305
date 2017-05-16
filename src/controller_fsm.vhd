@@ -97,6 +97,7 @@ begin
 				level <= "11";
 			when training =>
 				trainingMode <= '1';
+				level <= "01";
 			when fail =>
 				show_menu <= '1';
 			when success =>
