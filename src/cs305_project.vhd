@@ -7,7 +7,7 @@ entity cs305_project is
 	port (
 		clk, bt2 : IN std_logic;
 		mouse_data, mouse_clk : INOUT std_logic;
-		btn_1, left_btn : OUT std_logic;
+		led : OUT std_logic_vector(9 downto 0);
 		horiz_sync_out, vert_sync_out : OUT std_logic;
 		red_out, green_out, blue_out : OUT std_logic_vector(3 downto 0);
 		seg0, seg1, seg2, seg3 : OUT std_logic_vector(6 downto 0);
@@ -149,8 +149,8 @@ begin
 	ai_win <= or_gate(wins_out);
 	
 	not_bt2 <= NOT bt2;
-	btn_1 <= NOT bt2;
-	left_btn <= shoot_signal;
+	led(9) <= NOT bt2;
+	led(0) <= shoot_signal;
 
 	health <= health - 1 when ai_respawn = '1' and rising_edge(divided_clk);
 
