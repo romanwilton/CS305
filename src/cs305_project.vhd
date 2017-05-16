@@ -38,31 +38,62 @@ architecture arch of cs305_project is
 		);
 	end component rand_gen;
 
-	signal divided_clk, left_button, shoot_signal, right_button : std_logic;
-	signal off_screen, bullet_shot : std_logic;
-	signal increase_score, increase_streak : std_logic;
-	signal ai_reset, ai_respawn : std_logic;
-	signal mouse_x_location, random_pos, user_location : std_logic_vector(9 downto 0);
-	signal pixel_row, pixel_col : std_logic_vector(9 downto 0);
+-------------------------------------------------------------------------------
+-----------------------------Signal Definitions--------------------------------
+-------------------------------------------------------------------------------
+
+	--System signals
+	signal divided_clk : std_logic;
+	signal s_flash_address : std_logic_vector(21 downto 0);
+
+	--Position signals
 	signal bullet_y_pos, bullet_x_pos : std_logic_vector(9 downto 0);
+	signal mouse_x_location, random_pos, user_location : std_logic_vector(9 downto 0);
+
+	--Graphics signals
 	signal layers : pixel(NUM_LAYERS-1 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
-	signal not_bt2, not_bt1, enable_move : std_logic;
+	signal pixel_row, pixel_col : std_logic_vector(9 downto 0);
+	signal enable_move : std_logic;
+
+	--User input signals
+	signal left_button, right_button, not_bt2, not_bt1 : std_logic;
+
+	--gameFSM outputs
+	signal bullet_shot, increase_score, increase_streak : std_logic;
+	signal ai_reset, ai_respawn : std_logic;
+
+	--AI tanks signals
+	signal start_tank, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
+	signal bullet_collision, ai_win : std_logic := '0';
+
+	--Bullet signals
+	signal off_screen, shoot_signal : std_logic;
+	
+	--Counter values
 	signal current_score : N_digit_num(N_SCORE-1 downto 0);
 	signal streak_score : N_digit_num(N_STREAK-1 downto 0);
-	signal bullet_collision, ai_win : std_logic := '0';
-	signal start_tank, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
-	signal s_flash_address : std_logic_vector(21 downto 0);
 	signal health : integer range 0 to 3 := 3;
-	signal playClick, trainClick : std_logic;
+	
+	--Menu/controller states
 	signal playerWin, playerDie : std_logic;
+	signal playClick, trainClick : std_logic;
 	signal showMenu, trainingMode : std_logic;
 	signal level : std_logic_vector(1 downto 0);
 
 	--TODO remove this when menu is actually implemented
 	signal temp_red_out : std_logic_vector(3 downto 0);
 
+-------------------------------------------------------------------------------
+---------------------------Signal Definitions End------------------------------
+-------------------------------------------------------------------------------
+
 begin
+
+-------------------------------------------------------------------------------
+----------------------------Entity Instantiations------------------------------
+-------------------------------------------------------------------------------
+
 	--Helper blocks
 	ClockDivider : entity work.clock_div port map(clk, divided_clk);
 	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, open, mouse_x_location);
@@ -96,6 +127,10 @@ begin
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
 		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
 	end generate TANK_GEN;
+
+-------------------------------------------------------------------------------
+--------------------------Entity Instantiations End----------------------------
+-------------------------------------------------------------------------------
 
 	red_out <= "1111" when showMenu = '1' else temp_red_out;
 	playClick <= not_bt1;
