@@ -189,7 +189,16 @@ begin
 	led(9) <= NOT bt2;
 	led(0) <= shoot_signal;
 
-	health <= health - 1 when ai_respawn = '1' and rising_edge(divided_clk);
+	healthModifier : process( divided_clk )
+	begin
+		if (rising_edge(divided_clk)) then
+			if (showMenu = '1') then
+				health <= 3;
+			elsif (ai_respawn = '1') then
+				health <= health - 1;
+			end if;
+		end if;
+	end process ; -- healthModifier
 
 	
 	-- FLASH
