@@ -9,7 +9,6 @@ entity cs305_project is
 		mouse_data, mouse_clk : INOUT std_logic;
 		btn_1, left_btn : OUT std_logic;
 		horiz_sync_out, vert_sync_out : OUT std_logic;
-		state_ind : OUT std_logic_vector(3 downto 0);
 		red_out, green_out, blue_out : OUT std_logic_vector(3 downto 0);
 		seg0, seg1, seg2, seg3 : OUT std_logic_vector(6 downto 0);
 		audio_out : OUT std_logic;
@@ -51,7 +50,7 @@ architecture arch of cs305_project is
 	signal not_bt2, enable_move : std_logic;
 	signal current_score : N_digit_num(N_SCORE-1 downto 0);
 	signal streak_score : N_digit_num(N_STREAK-1 downto 0);
-	signal collision, win : std_logic := '0';
+	signal bullet_collision, ai_win : std_logic := '0';
 	signal delays_out, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
 	signal s_flash_address : std_logic_vector(21 downto 0);
 	signal health : integer range 0 to 3 := 3;
@@ -72,7 +71,7 @@ begin
 	
 	--FSMs
 	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, showMenu, trainingMode, level);
-	GameFSM : entity work.fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision, win, showMenu, bullet_shot, ai_reset, ai_respawn, increase_score, increase_streak, state_ind);
+	GameFSM : entity work.fsm port map(divided_clk, showMenu, not_bt2, shoot_signal, off_screen, bullet_collision, ai_win, bullet_shot, ai_reset, ai_respawn, increase_score, increase_streak);
 	
 	--Game objects
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+1));
@@ -95,7 +94,7 @@ begin
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
-		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, delays_out(i) or ai_reset, increase_streak, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
+		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, delays_out(i), ai_reset, ai_respawn, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
 	end generate TANK_GEN;
 
 	red_out <= "1111" when showMenu = '1' else temp_red_out;
@@ -103,7 +102,7 @@ begin
 	trainClick <= '0';
 	playerDie <= '1' when health = 0 else '0';
 
-	identifier : process( divided_clk )
+	awfulHardcodedRubbish : process( divided_clk )
 		variable oldLevel : std_logic_vector(1 downto 0);
 	begin
 		if(rising_edge(divided_clk)) then
@@ -128,7 +127,7 @@ begin
 				delays_out(2) <= '0';
 			end if;
 		end if;
-	end process ; -- identifier
+	end process ; -- awfulHardcodedRubbish
 
 	TEMP_FUCK_OFF : process( divided_clk )
 		variable oldvalue : std_logic;
@@ -146,8 +145,8 @@ begin
 	
 
 
-	collision <= or_gate(collisions_out);
-	win <= or_gate(wins_out);
+	bullet_collision <= or_gate(collisions_out);
+	ai_win <= or_gate(wins_out);
 	
 	not_bt2 <= NOT bt2;
 	btn_1 <= NOT bt2;

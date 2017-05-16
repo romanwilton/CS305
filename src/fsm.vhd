@@ -4,15 +4,14 @@ use IEEE.std_logic_unsigned.all;
 
 entity fsm is
 	port (
-		clock, btn_1, left_btn, right_btn, off_screen, collision, win, game_over : IN std_logic;
-		bullet_shot, ai_reset, ai_respawn, increase_score, increase_streak : OUT std_logic;
-		state_indicator : OUT std_logic_vector(3 downto 0)
+		clock, reset, btn_1, left_btn, off_screen, collision, win : IN std_logic;
+		bullet_shot, ai_reset, ai_respawn, increase_score, increase_streak : OUT std_logic
 	);
 end entity fsm;
 
 architecture arch of fsm is
-	type states is (start, not_shot, shot, collided, ai_win);
-	signal state : states := start;
+	type states is (disable, inactive, not_shot, shot, collided, ai_win);
+	signal state : states := disable;
 	signal next_state : states;
 begin
 
@@ -23,18 +22,22 @@ begin
 		end if;
 	end process progress_state;
 
-	next_state_logic : process (state, btn_1, left_btn, right_btn, off_screen, collision, win, game_over) is
+	next_state_logic : process (state, reset, btn_1, left_btn, off_screen, collision, win) is
 	begin
 		case state is
-			when start =>
-				if (game_over = '1') then
-					next_state <= start;
-				else
+			when disable =>
+					next_state <= inactive;
+			when inactive =>
+				if (reset = '1') then
+					next_state <= disable;
+				elsif (btn_1 = '1') then
 					next_state <= not_shot;
+				else
+					next_state <= inactive;
 				end if;
 			when not_shot =>
-				if (game_over = '1') then
-					next_state <= start;
+				if (reset = '1') then
+					next_state <= disable;
 				elsif (left_btn = '1') then
 					next_state <= shot;
 				elsif(win = '1') then
@@ -43,8 +46,8 @@ begin
 					next_state <= not_shot;
 				end if;
 			when shot =>
-				if (game_over = '1') then
-					next_state <= start;
+				if (reset = '1') then
+					next_state <= disable;
 				elsif (off_screen = '1') then
 					next_state <= not_shot;
 				elsif (collision = '1') then
@@ -53,14 +56,14 @@ begin
 					next_state <= shot;
 				end if;
 			when collided =>
-			if (game_over = '1') then
-					next_state <= start;
+				if (reset = '1') then
+					next_state <= disable;
 				else
 					next_state <= not_shot;
 				end if;
 			when ai_win =>
-				if (game_over = '1') then
-					next_state <= start;
+				if (reset = '1') then
+					next_state <= disable;
 				else
 					next_state <= not_shot;
 				end if;
@@ -77,21 +80,17 @@ begin
 
 
 		case state is
-			when start =>
+			when disable =>
 				ai_reset <= '1';
-				state_indicator <= "0001";
+			when inactive =>
 			when not_shot =>
-				state_indicator <= "0010";
 			when shot =>
 				bullet_shot <= '1';
-				state_indicator <= "0100";
 			when collided =>
 				increase_score <= '1';
 				increase_streak <= '1';
-				state_indicator <= "0101";
 			when ai_win =>
 				ai_respawn <= '1';
-				state_indicator <= "0110";
 		end case;
 	end process output_logic;
 
