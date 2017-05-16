@@ -19,6 +19,8 @@ entity draw_score is
 end entity draw_score;
 
 architecture arch of draw_score is
+
+	constant N_LINES : natural := 3;
 	
 	signal character_address : STD_LOGIC_VECTOR (5 DOWNTO 0);
 	signal row, col : STD_LOGIC_VECTOR (2 DOWNTO 0);
@@ -80,26 +82,24 @@ begin
 	begin	
 		character_address <= "000000";
 		row <= "000";
-		col <= "000";
-		for i in 2 downto 0 loop
+		for i in N_LINES-1 downto 0 loop
 			if next_pixel_signals(i).enable = '1' then
 				character_address <= next_pixel_signals(i).character_address;
 				row <= next_pixel_signals(i).font_row;
-				col <= next_pixel_signals(i).font_col;
 			end if;
 		end loop;
 	end process next_pixel;
 	
-	output : process (rom_out, all_signals) is
+	column : process (all_signals) is
 	begin
-		colour_out <= X"0000";		
-		for i in 2 downto 0 loop
+		col <= "000";
+		for i in N_LINES-1 downto 0 loop
 			if all_signals(i).enable = '1' then
-				if (rom_out = '1') then
-					colour_out <= "1000000000011111";
-				end if;
+				col <= all_signals(i).font_col;
 			end if;
 		end loop;
-	end process output;
+	end process column;
+	
+	colour_out <= "1000000000011111" when rom_out = '1' else X"0000";
 	
 end architecture arch;
