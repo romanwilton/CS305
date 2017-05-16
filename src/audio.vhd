@@ -6,7 +6,6 @@ use IEEE.math_real.all;
 
 entity audio is
 	generic (
-		sound_path : string;
 		sound_length : integer
 	);
 	port (

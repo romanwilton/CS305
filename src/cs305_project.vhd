@@ -91,7 +91,7 @@ begin
 	SevenSegDecoder2 : entity work.dec_7seg port map(current_score(1), seg1);
 	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
-	AudioPWM : entity work.audio generic map ("audio/audio_test.mif", 1239040) port map (divided_clk, flash_data, audio_out, s_flash_address);
+	AudioPWM : entity work.audio generic map (1239040) port map (divided_clk, flash_data, audio_out, s_flash_address);
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
