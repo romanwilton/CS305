@@ -1,6 +1,7 @@
 LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
+use IEEE.std_logic_arith.all;
 use work.util.all;
 
 entity draw_score is
@@ -56,10 +57,10 @@ begin
 	begin
 		
 		MakeHeartString : for i in 1 to 3 loop
-			if(health >= i) then
-				healthStr(i-1) <= O"73";
+			if (i <= health) then
+				healthStr(3-i) <= O"73";
 			else
-				healthStr(i-1) <= string2char_array(" ")(0);
+				healthStr(3-i) <= string2char_array(" ")(0);
 			end if;
 		end loop ; -- MakeHeartString
 	end process ; -- healthString

@@ -60,7 +60,7 @@ begin
 	ClockDivider : entity work.clock_div port map(clk, divided_clk);
 	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, open, mouse_x_location);
 	MouseDebouncer : entity work.debounce port map(divided_clk, left_button, shoot_signal);
-	StateMachine : entity work.fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision, win, bullet_shot, ai_reset, ai_hold, ai_respawn, increase_score, increase_streak, state_ind);
+	FSM : entity work.fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision, win, bullet_shot, ai_reset, ai_hold, ai_respawn, increase_score, increase_streak, state_ind);
 	SevenSegDecoder1 : entity work.dec_7seg port map(current_score(0), seg0);
 	SevenSegDecoder2 : entity work.dec_7seg port map(current_score(1), seg1);
 	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
@@ -86,6 +86,9 @@ begin
 	not_bt2 <= NOT bt2;
 	btn_1 <= NOT bt2;
 	left_btn <= shoot_signal;
+
+	health <= health - 1 when ai_respawn = '1' and rising_edge(divided_clk);
+
 	
 	-- FLASH
 	flash_address <= "0" & s_flash_address(21 downto 1);

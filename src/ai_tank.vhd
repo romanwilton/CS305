@@ -82,13 +82,13 @@ begin
 					x <= x - SPEED; 	
 				end if; 
 
-				if(y >= CONV_STD_LOGIC_VECTOR(420, 10)) then
+			end if;
+			if(y >= CONV_STD_LOGIC_VECTOR(420, 10)) then
 					win <= '1';
 					reset_AI_tank(new_pos, intital_y, rand_in, intermediate, x_var, x, y, moveDir);
 				else
 					win <= '0';
 				end if;
-			end if;
 		end if;
 	end process ; -- movement
 
