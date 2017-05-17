@@ -16,8 +16,8 @@ entity cs305_project is
 		
 		-- FLASH
 		flash_address : out std_logic_vector(21 downto 0);
-		flash_data : in std_logic_vector(7 downto 0);
-		flash_data_15 : out std_logic;
+		flash_data : in std_logic_vector(15 downto 0);
+		--flash_data_15 : out std_logic;
 		flash_byte_word_mode, flash_chip_enable, flash_output_enable, flash_reset, flash_write_enable, flash_write_protect : out std_logic
 	);
 end entity cs305_project;
@@ -61,20 +61,21 @@ begin
 	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, open, mouse_x_location);
 	MouseDebouncer : entity work.debounce port map(divided_clk, left_button, shoot_signal);
 	StateMachine : entity work.fsm port map(divided_clk, not_bt2, shoot_signal, right_button, off_screen, collision, win, bullet_shot, ai_reset, ai_hold, ai_respawn, increase_score, increase_streak, state_ind);
-	SevenSegDecoder1 : entity work.dec_7seg port map(current_score(0), seg0);
-	SevenSegDecoder2 : entity work.dec_7seg port map(current_score(1), seg1);
-	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
-	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
+	SevenSegDecoder1 : entity work.dec_7seg port map(flash_data(3 downto 0), seg0);
+	SevenSegDecoder2 : entity work.dec_7seg port map(flash_data(7 downto 4), seg1);
+	SevenSegDecoder3 : entity work.dec_7seg port map(flash_data(11 downto 8), seg2);
+	SevenSegDecoder4 : entity work.dec_7seg port map(flash_data(15 downto 12), seg3);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+1));
 	UserBullet : entity work.bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(N_AI_TANK+0));
 	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
 	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col);
 	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, health, pixel_row, pixel_col, layers(N_AI_TANK+2));
-	BackgorundImage : entity work.background port map (divided_clk, pixel_row, pixel_col, layers(N_AI_TANK+3));
+	--BackgorundImage : entity work.background port map (divided_clk, pixel_row, pixel_col, layers(N_AI_TANK+3));
+	BackgorundImage : entity work.background_buffer port map (divided_clk, s_flash_address, flash_data, pixel_row, pixel_col, layers(N_AI_TANK+3));
 	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, increase_score, '0', current_score);
 	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, increase_streak, off_screen OR ai_respawn, streak_score);
-	AudioPWM : entity work.audio generic map ("audio/audio_test.mif", 1239040) port map (divided_clk, flash_data, audio_out, s_flash_address);
+	--AudioPWM : entity work.audio generic map ("audio/audio_test.mif", 1239040) port map (divided_clk, flash_data, audio_out, s_flash_address);
 	
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
 		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, delays_out(i), increase_streak, ai_hold, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
@@ -87,14 +88,24 @@ begin
 	btn_1 <= NOT bt2;
 	left_btn <= shoot_signal;
 	
-	-- FLASH
-	flash_address <= "0" & s_flash_address(21 downto 1);
-	flash_data_15 <= s_flash_address(0);
+	-- FLASH (byte mode)
+	-- flash_address <= "0" & s_flash_address(21 downto 1);
+	-- flash_data_15 <= s_flash_address(0);
+	-- flash_chip_enable <= '0';
+	-- flash_output_enable <= '0';
+	-- flash_write_enable <= '1';
+	-- flash_reset <= '1';
+	-- flash_write_protect <= '0';
+	-- flash_byte_word_mode <= '0';
+	
+	-- FLASH (word mode)
+	--flash_address <= "0000000000000000000000";
+	flash_address <= s_flash_address;
 	flash_chip_enable <= '0';
 	flash_output_enable <= '0';
 	flash_write_enable <= '1';
 	flash_reset <= '1';
 	flash_write_protect <= '0';
-	flash_byte_word_mode <= '0'; -- byte mode
+	flash_byte_word_mode <= '1';
 	
 end architecture arch;
