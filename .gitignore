@@ -3,6 +3,7 @@
 !src/
 !audio/
 !images/
+!combined/
 !images/Source/
 !test/
 !*.vhd
@@ -20,3 +21,4 @@
 !*.pdn
 !*.wav
 !*.hex
+!*.bat

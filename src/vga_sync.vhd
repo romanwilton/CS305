@@ -9,7 +9,7 @@ ENTITY VGA_SYNC IS
 		red, green, blue : IN STD_LOGIC_VECTOR(3 downto 0);
 		red_out, green_out, blue_out : OUT STD_LOGIC_VECTOR(3 downto 0);
 		horiz_sync_out, vert_sync_out, enable_move : OUT STD_LOGIC;
-		pixel_row, pixel_column: OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
+		pixel_row, pixel_column, h_count_out: OUT STD_LOGIC_VECTOR(9 DOWNTO 0)
 	);
 END VGA_SYNC;
 
@@ -97,6 +97,7 @@ BEGIN
 		
 		horiz_sync_out <= horiz_sync;
 		vert_sync_out <= vert_sync;
+		h_count_out <= h_count;
 
 	END PROCESS;
 END a;
