@@ -47,11 +47,11 @@ begin
 				if (wait_cnt = 1) then
 				
 					if (count > 2 and count < 330) then
-						flash_address <= ("0000000000000" & p_row_plus_1(9 downto 1)) + count*240;
+						flash_address <= ("0000000000000" & p_row_plus_1(9 downto 1)) + (count - 3)*240;
 					end if;
 
 					if (count > 3 and count < 330) then
-						buff(count-5) <= flash_data(7 downto 0) & flash_data(15 downto 8);
+						buff(count - 4) <= flash_data(7 downto 0) & flash_data(15 downto 8);
 					end if;
 					
 					if (count = 0) then
