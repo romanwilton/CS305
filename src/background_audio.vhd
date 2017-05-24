@@ -4,7 +4,7 @@ use IEEE.std_logic_unsigned.all;
 use IEEE.std_logic_arith.all;
 use work.util.all;
 
-entity background_buffer is
+entity background_audio is
 	port(
 		clk : in std_logic;
 		background : in integer range 0 to 5;
@@ -16,7 +16,7 @@ entity background_buffer is
 	);
 end entity;
 
-architecture arch of background_buffer is
+architecture arch of background_audio is
 	constant IM_SIZE : integer := 320*240;
 	constant sound_length : integer := 320000;
 	constant sound_start : integer := IM_SIZE*6;

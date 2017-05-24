@@ -71,7 +71,7 @@ begin
 	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
 	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col, h_count);
 	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, health, pixel_row, pixel_col, layers(N_AI_TANK+2));
-	BackgorundImage : entity work.background_buffer port map (divided_clk, background, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+3), audio_out);
+	BackgorundAudio : entity work.background_audio port map (divided_clk, background, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+3), audio_out);
 	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, increase_score, '0', current_score);
 	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, increase_streak, off_screen OR ai_respawn, streak_score);
 	
