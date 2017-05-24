@@ -5,7 +5,7 @@ use work.util.all;
 
 entity cs305_project is
 	port (
-		clk, bt1, bt2 : IN std_logic;
+		clk, bt0, bt1, bt2 : IN std_logic;
 		mouse_data, mouse_clk : INOUT std_logic;
 		led : OUT std_logic_vector(9 downto 0);
 		horiz_sync_out, vert_sync_out : OUT std_logic;
@@ -60,7 +60,7 @@ architecture arch of cs305_project is
 	signal left_button, right_button, not_bt2, not_bt1 : std_logic;
 
 	--gameFSM outputs
-	signal bullet_shot, increase_score, increase_streak : std_logic;
+	signal bullet_shot, ai_tank_hit : std_logic;
 	signal ai_reset, ai_respawn : std_logic;
 
 	--AI tanks signals
@@ -83,6 +83,7 @@ architecture arch of cs305_project is
 
 	--TODO remove this when menu is actually implemented
 	signal temp_red_out : std_logic_vector(3 downto 0);
+	signal ded : std_logic;
 
 -------------------------------------------------------------------------------
 ---------------------------Signal Definitions End------------------------------
@@ -102,7 +103,7 @@ begin
 	
 	--FSMs
 	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, showMenu, trainingMode, level);
-	GameFSM : entity work.fsm port map(divided_clk, showMenu, not_bt2, shoot_signal, off_screen, bullet_collision, ai_win, bullet_shot, ai_reset, ai_respawn, increase_score, increase_streak);
+	GameFSM : entity work.fsm port map(divided_clk, showMenu, not_bt2, shoot_signal, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
 	
 	--Game objects
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+1));
@@ -110,8 +111,8 @@ begin
 	BackgorundImage : entity work.background port map (divided_clk, pixel_row, pixel_col, layers(N_AI_TANK+3));
 
 	--Counters
-	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, increase_score, '0', current_score);
-	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, increase_streak, off_screen OR ai_respawn, streak_score);
+	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, ai_tank_hit, '0', current_score);
+	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, ai_tank_hit, off_screen OR ai_respawn, streak_score);
 
 	--User outputs
 	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
@@ -125,7 +126,7 @@ begin
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
-		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
+		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, ai_tank_hit, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
 	end generate TANK_GEN;
 
 -------------------------------------------------------------------------------
@@ -136,6 +137,7 @@ begin
 	playClick <= not_bt1;
 	trainClick <= '0';
 	playerDie <= '1' when health = 0 else '0';
+
 
 	awfulHardcodedRubbish : process( divided_clk )
 		variable oldLevel : std_logic_vector(1 downto 0);
@@ -171,14 +173,25 @@ begin
 		if(rising_edge(divided_clk)) then
 			if (oldvalue /= right_button) and right_button = '1' then
 				playerWin <= '1';
-				oldvalue := right_button;
 			else
 				playerWin <= '0';
 			end if;
+			oldvalue := right_button;
 		end if;
 	end process ; -- rightClickRisingEdge
 
-	
+	aiwinrisingedge : process( divided_clk )
+		variable oldvalue : std_logic;
+	begin
+		if(rising_edge(divided_clk)) then
+			if (oldvalue /= ai_win) and ai_win = '1' then
+				ded <= '1';
+			else
+				ded <= '0';
+			end if;
+			oldvalue := ai_win;
+		end if;
+	end process ; -- aiwinrisingedge
 
 
 	bullet_collision <= or_gate(collisions_out);
@@ -188,6 +201,11 @@ begin
 	not_bt1 <= NOT bt1;
 	led(9) <= NOT bt2;
 	led(0) <= shoot_signal;
+	led(1) <= left_button;
+	led(2) <= playClick;
+	led(3) <= showMenu;
+	led(4) <= ai_reset;
+	led(5) <= playerWin;
 
 	healthModifier : process( divided_clk )
 	begin

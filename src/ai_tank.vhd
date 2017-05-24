@@ -6,11 +6,11 @@ use work.util.all;
 
 entity ai_tank is
 	generic (
-		IMAGE : in string := "images/enemyTank.mif";
+		IMAGE : in string := "images/enemyTank1.mif";
 		SPEED : in natural := 3
 	);
 	port (
-		clock, start, reset, respawn, enable_move : IN std_logic;
+		clock, start, reset, respawn, tank_hit, enable_move : IN std_logic;
 		pixel_row, pixel_col, new_pos, bullet_x_pos, bullet_y_pos : IN std_logic_vector(9 downto 0);
 		collision, win	: OUT std_logic;
 		RGB_out	: OUT std_logic_vector(15 downto 0)
@@ -46,9 +46,10 @@ architecture arch of ai_tank is
 	end procedure;
 
 	signal x : std_logic_vector(9 downto 0);
-	signal y : std_logic_vector(9 downto 0);
+	signal y : std_logic_vector(9 downto 0) := intital_y;
 	signal moveDir : std_logic := '0';
-	signal s_collision, enabled : std_logic := '0';
+	signal s_collision : std_logic := '0';
+	signal enabled : std_logic := '1';
 	signal RGB : std_logic_vector(15 downto 0);
 begin
 	output_drawing : entity work.draw_object generic map (IMAGE, width, height) 
@@ -65,11 +66,11 @@ begin
 				reset_AI_tank(new_pos, intital_y, rand_in, intermediate, x_var, x, y, moveDir);
 			elsif (start = '1') then
 				enabled <= '1';
-			elsif (respawn = '1' and s_collision = '1') then
+			elsif (tank_hit = '1' and s_collision = '1') then
 				reset_AI_tank(new_pos, intital_y, rand_in, intermediate, x_var, x, y, moveDir);
 			end if;
 
-			if(enabled = '1') then
+			if(enabled = '1' and enable_move = '1') then
 			-- Movement logic
 				if (x >= CONV_STD_LOGIC_VECTOR(640, 10)) and (x <= CONV_STD_LOGIC_VECTOR(650, 10)) then
 					y <= y + 20;

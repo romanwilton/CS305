@@ -5,7 +5,7 @@ use IEEE.std_logic_unsigned.all;
 entity fsm is
 	port (
 		clock, reset, btn_1, left_btn, off_screen, collision, win : IN std_logic;
-		bullet_shot, ai_reset, ai_respawn, increase_score, increase_streak : OUT std_logic
+		bullet_shot, ai_reset, ai_respawn, tank_hit : OUT std_logic
 	);
 end entity fsm;
 
@@ -73,10 +73,9 @@ begin
 	output_logic : process (state) is
 	begin
 		bullet_shot <= '0';
-		increase_score <= '0';
+		tank_hit <= '0';
 		ai_reset <= '0';
 		ai_respawn <= '0';
-		increase_streak <= '0';
 
 
 		case state is
@@ -87,8 +86,7 @@ begin
 			when shot =>
 				bullet_shot <= '1';
 			when collided =>
-				increase_score <= '1';
-				increase_streak <= '1';
+				tank_hit <= '1';
 			when ai_win =>
 				ai_respawn <= '1';
 		end case;
