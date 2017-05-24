@@ -6,7 +6,7 @@ use work.util.all;
 
 entity background_buffer is
 	port(
-		clk : in std_logic;
+		clk, dip_switch : in std_logic;
 		flash_address : out std_logic_vector(21 downto 0);
 		flash_data : in std_logic_vector(15 downto 0);
 		pixel_row, pixel_col, h_count : in std_logic_vector(9 downto 0);
@@ -16,11 +16,13 @@ entity background_buffer is
 end entity;
 
 architecture arch of background_buffer is
+	constant IM_SIZE : integer := 320*240;
 	constant sound_length : integer := 320000;
-	constant sound_start : integer := 320*240;
+	constant sound_start : integer := IM_SIZE;
 	
 	signal buff : pixel(639 downto 0);
 	SIGNAL duty : STD_LOGIC_VECTOR (9 DOWNTO 0);
+	signal flash_address_s : std_logic_vector(21 downto 0);
 begin
 
 	process (clk) is
@@ -28,13 +30,19 @@ begin
 		variable wait_cnt : integer range -1 to 3 := 0;
 		variable p_row_plus_1 : std_logic_vector(9 downto 0);
 		variable sound_address : std_logic_vector(21 downto 0);
+		variable flash_address_temp : std_logic_vector(21 downto 0);
 	begin
 		if (rising_edge(clk)) then
 		
 			if (h_count = 0) then
 				count := 0;
 				wait_cnt := 0;
-				p_row_plus_1 := pixel_row + 1;
+				
+				if (pixel_row = 479) then
+					p_row_plus_1 := (others => '0');
+				else
+					p_row_plus_1 := pixel_row + 1;
+				end if;
 			else
 
 				if (h_count(9 downto 1) <= duty) then
@@ -43,15 +51,20 @@ begin
 					PWM <= '0';
 				end if;
 			
-				-- Triggered every second clock cycle (every 80us)
+				-- Triggered every second clock cycle (every 80ns)
 				if (wait_cnt = 1) then
 				
 					if (count > 2 and count < 330) then
-						flash_address <= ("0000000000000" & p_row_plus_1(9 downto 1)) + (count - 3)*240;
+						flash_address_temp := ("0000000000000" & p_row_plus_1(9 downto 1)) + (count - 3)*240;
+						if (dip_switch = '1') then
+							flash_address_s <= flash_address_temp + IM_SIZE;
+						else
+							flash_address_s <= flash_address_temp + 0;
+						end if;
 					end if;
 
 					if (count > 3 and count < 330) then
-						buff(count - 4) <= flash_data(7 downto 0) & flash_data(15 downto 8);
+						buff(count - 5) <= flash_data(7 downto 0) & flash_data(15 downto 8);
 					end if;
 					
 					if (count = 0) then
@@ -60,7 +73,7 @@ begin
 						else
 							sound_address := sound_address + 1;
 						end if;	
-						flash_address <= sound_address + CONV_STD_LOGIC_VECTOR(sound_start, 22);
+						flash_address_s <= sound_address + CONV_STD_LOGIC_VECTOR(sound_start, 22);
 					end if;
 					
 					if (count = 2) then
@@ -79,5 +92,6 @@ begin
 	end process;
 	
 	RGB_out <= buff(CONV_INTEGER(pixel_col(9 downto 1)));
+	flash_address <= flash_address_s;
 
 end architecture;
