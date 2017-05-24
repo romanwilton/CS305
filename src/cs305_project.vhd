@@ -5,7 +5,7 @@ use work.util.all;
 
 entity cs305_project is
 	port (
-		clk, bt0, bt1, bt2 : IN std_logic;
+		clk, bt0, bt1, bt2, sw0 : IN std_logic;
 		mouse_data, mouse_clk : INOUT std_logic;
 		led : OUT std_logic_vector(9 downto 0);
 		horiz_sync_out, vert_sync_out : OUT std_logic;
@@ -15,8 +15,7 @@ entity cs305_project is
 		
 		-- FLASH
 		flash_address : out std_logic_vector(21 downto 0);
-		flash_data : in std_logic_vector(7 downto 0);
-		flash_data_15 : out std_logic;
+		flash_data : in std_logic_vector(15 downto 0);
 		flash_byte_word_mode, flash_chip_enable, flash_output_enable, flash_reset, flash_write_enable, flash_write_protect : out std_logic
 	);
 end entity cs305_project;
@@ -53,8 +52,9 @@ architecture arch of cs305_project is
 	--Graphics signals
 	signal layers : pixel(NUM_LAYERS-1 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
-	signal pixel_row, pixel_col : std_logic_vector(9 downto 0);
+	signal pixel_row, pixel_col, h_count : std_logic_vector(9 downto 0);
 	signal enable_move : std_logic;
+	signal background : integer range 0 to 5;
 
 	--User input signals
 	signal left_button, right_button, not_bt2, not_bt1 : std_logic;
@@ -89,6 +89,7 @@ architecture arch of cs305_project is
 ---------------------------Signal Definitions End------------------------------
 -------------------------------------------------------------------------------
 
+	
 begin
 
 -------------------------------------------------------------------------------
@@ -108,21 +109,20 @@ begin
 	--Game objects
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+1));
 	UserBullet : entity work.bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(N_AI_TANK+0));
-	BackgorundImage : entity work.background port map (divided_clk, pixel_row, pixel_col, layers(N_AI_TANK+3));
-
+	
 	--Counters
 	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, ai_tank_hit, '0', current_score);
 	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, ai_tank_hit, off_screen OR ai_respawn, streak_score);
 
 	--User outputs
 	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
-	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), temp_red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col);
-	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, health, pixel_row, pixel_col, layers(N_AI_TANK+2));
 	SevenSegDecoder1 : entity work.dec_7seg port map(current_score(0), seg0);
 	SevenSegDecoder2 : entity work.dec_7seg port map(current_score(1), seg1);
 	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
-	AudioPWM : entity work.audio generic map (1239040) port map (divided_clk, flash_data, audio_out, s_flash_address);
+	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col, h_count);
+	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, health, pixel_row, pixel_col, layers(N_AI_TANK+2));
+	BackgroundAndAudio : entity work.background_audio port map (divided_clk, background, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+3), audio_out);
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
@@ -133,7 +133,6 @@ begin
 --------------------------Entity Instantiations End----------------------------
 -------------------------------------------------------------------------------
 
-	red_out <= "1111" when showMenu = '1' else temp_red_out;
 	playClick <= not_bt1;
 	trainClick <= '0';
 	playerDie <= '1' when health = 0 else '0';
@@ -206,6 +205,8 @@ begin
 	led(3) <= showMenu;
 	led(4) <= ai_reset;
 	led(5) <= playerWin;
+	
+	background <= 1 when sw0 = '1' else 0;
 
 	healthModifier : process( divided_clk )
 	begin
@@ -219,14 +220,13 @@ begin
 	end process ; -- healthModifier
 
 	
-	-- FLASH
-	flash_address <= "0" & s_flash_address(21 downto 1);
-	flash_data_15 <= s_flash_address(0);
+	-- FLASH (word mode)
+	flash_address <= s_flash_address;
 	flash_chip_enable <= '0';
 	flash_output_enable <= '0';
 	flash_write_enable <= '1';
 	flash_reset <= '1';
 	flash_write_protect <= '0';
-	flash_byte_word_mode <= '0'; -- byte mode
+	flash_byte_word_mode <= '1';
 	
 end architecture arch;
