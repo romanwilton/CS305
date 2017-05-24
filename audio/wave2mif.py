@@ -21,7 +21,7 @@ raw_frames = wr.readframes(num_frames)
 
 for i in range(num_frames):
     frame = raw_frames[i]
-    hex_out.write("%04X" % frame)
+    hex_out.write("%02X" % frame)
 
 note_out.write("%d frames written\n" % num_frames)
 	

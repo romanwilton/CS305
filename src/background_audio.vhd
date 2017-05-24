@@ -69,11 +69,15 @@ begin
 						else
 							sound_address := sound_address + 1;
 						end if;	
-						flash_address <= sound_address + CONV_STD_LOGIC_VECTOR(sound_start, 22);
+						flash_address <= sound_address(21 downto 1) + CONV_STD_LOGIC_VECTOR(sound_start, 22);
 					end if;
 					
 					if (count = 2) then
-						duty <= "00" & flash_data(15 downto 8);
+						if (sound_address(0) = '1') then
+							duty <= "00" & flash_data(15 downto 8);
+						else
+							duty <= "00" & flash_data(7 downto 0);
+						end if;
 					end if;
 
 					count := count + 1;
