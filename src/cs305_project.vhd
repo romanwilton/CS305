@@ -54,6 +54,7 @@ architecture arch of cs305_project is
 	signal delays_out, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
 	signal s_flash_address : std_logic_vector(21 downto 0);
 	signal health : integer range 0 to 3 := 3;
+	signal background : integer range 0 to 5;
 	
 begin
 	ClockDivider : entity work.clock_div port map(clk, divided_clk);
@@ -70,7 +71,7 @@ begin
 	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
 	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col, h_count);
 	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, health, pixel_row, pixel_col, layers(N_AI_TANK+2));
-	BackgorundImage : entity work.background_buffer port map (divided_clk, sw0, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+3), audio_out);
+	BackgorundImage : entity work.background_buffer port map (divided_clk, background, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+3), audio_out);
 	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, increase_score, '0', current_score);
 	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, increase_streak, off_screen OR ai_respawn, streak_score);
 	
@@ -84,6 +85,7 @@ begin
 	not_bt2 <= NOT bt2;
 	btn_1 <= NOT bt2;
 	left_btn <= shoot_signal;
+	background <= 1 when sw0 = '1' else 0;
 	
 	-- FLASH (word mode)
 	flash_address <= s_flash_address;
