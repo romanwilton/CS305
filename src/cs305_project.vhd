@@ -26,6 +26,7 @@ architecture arch of cs305_project is
 	constant NUM_LAYERS : integer := N_AI_TANK + 5;
 	constant N_SCORE : integer := 3;
 	constant N_STREAK : integer := 2;
+	constant N_TIMER : integer := 2;
 	type string_array is array (0 to 2) of string(1 to 21);
 	constant AI_IMAGES : string_array := ("images/enemyTank1.mif", "images/enemyTank2.mif", "images/enemyTank3.mif");
 
@@ -42,7 +43,7 @@ architecture arch of cs305_project is
 	-------------------------------------------------------------------------------
 
 	--System signals
-	signal divided_clk : std_logic;
+	signal divided_clk, one_sec_clk : std_logic;
 	signal s_flash_address : std_logic_vector(21 downto 0);
 
 	--Position signals
@@ -73,6 +74,7 @@ architecture arch of cs305_project is
 	--Counter values
 	signal current_score : N_digit_num(N_SCORE-1 downto 0);
 	signal streak_score : N_digit_num(N_STREAK-1 downto 0);
+	signal timer : N_digit_num(N_TIMER-1 downto 0);
 	signal health : integer range 0 to 3 := 3;
 	
 	--Menu/controller states
@@ -113,8 +115,9 @@ begin
 	menuMouse : entity work.menu_mouse port map(divided_clk, left_button, enable_move, controllerState, mouse_x_location, mouse_y_location, pixel_row, pixel_col, play_hover, playClick, train_hover, trainClick, layers(N_AI_TANK+0));
 
 	--Counters
-	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, ai_tank_hit, '0', current_score);
-	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, ai_tank_hit, off_screen OR ai_respawn, streak_score);
+	ScoreCounter : entity work.counter generic map (N_SCORE, false, (X"0", X"0", X"0")) port map(divided_clk, ai_tank_hit, '0', current_score);
+	StreakCounter : entity work.counter generic map (N_STREAK, false, (X"0", X"0")) port map(divided_clk, ai_tank_hit, off_screen OR ai_respawn, streak_score);
+	TimerCounter : entity work.counter generic map (N_STREAK, true, (X"3", X"0")) port map(divided_clk, one_sec_clk, playerWin or playClick or trainClick, timer);
 
 	--User outputs
 	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
@@ -123,7 +126,7 @@ begin
 	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
 	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col, h_count);
-	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, health, pixel_row, pixel_col, layers(N_AI_TANK+3));
+	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK, N_TIMER) port map (divided_clk, current_score, streak_score, timer, health, pixel_row, pixel_col, layers(N_AI_TANK+3));
 	BackgroundAndAudio : entity work.background_audio port map (divided_clk, background, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+4), audio_out);
 	
 	--AI generation
@@ -135,7 +138,8 @@ begin
 	--------------------------Entity Instantiations End----------------------------
 	-------------------------------------------------------------------------------
 
-	playerDie <= '1' when health = 0 else '0';
+
+	playerDie <= '1' when health = 0 or timer = (X"F", X"9") else '0';
 
 
 	awfulHardcodedRubbish : process( divided_clk )
@@ -226,6 +230,19 @@ begin
 		end if;
 	end process ; -- healthModifier
 
+	one_sec: process (divided_clk) is
+		variable count : integer range 0 to 25000000 := 0;
+	begin
+		if rising_edge(divided_clk) then
+			if (count = 25000000) then
+				one_sec_clk <= '1';
+				count := 0;
+			else
+				one_sec_clk <= '0';
+				count := count + 1;
+			end if;
+		end if;
+	end process one_sec;
 	
 	-- FLASH (word mode)
 	flash_address <= s_flash_address;
