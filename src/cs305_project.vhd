@@ -23,7 +23,7 @@ end entity cs305_project;
 architecture arch of cs305_project is
 
 	constant N_AI_TANK : integer := 3;
-	constant NUM_LAYERS : integer := 4 + N_AI_TANK;
+	constant NUM_LAYERS : integer := N_AI_TANK + 5;
 	constant N_SCORE : integer := 3;
 	constant N_STREAK : integer := 2;
 	type string_array is array (0 to 2) of string(1 to 21);
@@ -47,7 +47,7 @@ architecture arch of cs305_project is
 
 	--Position signals
 	signal bullet_y_pos, bullet_x_pos : std_logic_vector(9 downto 0);
-	signal mouse_x_location, random_pos, user_location : std_logic_vector(9 downto 0);
+	signal mouse_x_location, mouse_y_location, random_pos, user_location : std_logic_vector(9 downto 0);
 
 	--Graphics signals
 	signal layers : pixel(NUM_LAYERS-1 downto 0);
@@ -78,12 +78,12 @@ architecture arch of cs305_project is
 	--Menu/controller states
 	signal playerWin, playerDie : std_logic;
 	signal playClick, trainClick : std_logic;
+	signal play_hover, train_hover : std_logic;
 	signal showMenu, trainingMode : std_logic;
 	signal level : std_logic_vector(1 downto 0);
 	signal controllerState : states;
 
 	--TODO remove this when menu is actually implemented
-	signal temp_red_out : std_logic_vector(3 downto 0);
 	signal ded : std_logic;
 
 	-------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ begin
 
 	--Helper blocks
 	ClockDivider : entity work.clock_div port map(clk, divided_clk);
-	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, open, mouse_x_location);
+	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, mouse_y_location, mouse_x_location);
 	MouseDebouncer : entity work.debounce port map(divided_clk, left_button, shoot_signal);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	
@@ -108,9 +108,10 @@ begin
 	GameFSM : entity work.fsm port map(divided_clk, showMenu, not_bt2, shoot_signal, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
 	
 	--Game objects
-	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+1));
-	UserBullet : entity work.bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(N_AI_TANK+0));
-	
+	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+2));
+	UserBullet : entity work.bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(N_AI_TANK+1));
+	menuMouse : entity work.menu_mouse port map(divided_clk, left_button, enable_move, controllerState, mouse_x_location, mouse_y_location, pixel_row, pixel_col, play_hover, playClick, train_hover, trainClick, layers(N_AI_TANK+0));
+
 	--Counters
 	ScoreCounter : entity work.counter generic map (N_SCORE) port map(divided_clk, ai_tank_hit, '0', current_score);
 	StreakCounter : entity work.counter generic map (N_STREAK) port map(divided_clk, ai_tank_hit, off_screen OR ai_respawn, streak_score);
@@ -122,8 +123,8 @@ begin
 	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
 	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col, h_count);
-	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, health, pixel_row, pixel_col, layers(N_AI_TANK+2));
-	BackgroundAndAudio : entity work.background_audio port map (divided_clk, background, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+3), audio_out);
+	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK) port map (divided_clk, current_score, streak_score, health, pixel_row, pixel_col, layers(N_AI_TANK+3));
+	BackgroundAndAudio : entity work.background_audio port map (divided_clk, background, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+4), audio_out);
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
@@ -134,8 +135,6 @@ begin
 	--------------------------Entity Instantiations End----------------------------
 	-------------------------------------------------------------------------------
 
-	playClick <= not_bt1;
-	trainClick <= '0';
 	playerDie <= '1' when health = 0 else '0';
 
 
