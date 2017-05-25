@@ -133,7 +133,7 @@ begin
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
-		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, ai_tank_hit, tank_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
+		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*4) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, ai_tank_hit, tank_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
 	end generate TANK_GEN;
 
 	-------------------------------------------------------------------------------

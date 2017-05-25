@@ -19,7 +19,7 @@ end entity;
 
 architecture arch of background_audio is
 	constant IM_SIZE : integer := 320*240;
-	constant sound_length : integer := 320000;
+	constant sound_length : integer := 1120000;
 	constant sound_start : integer := IM_SIZE*6;
 	
 	signal buff : pixel(639 downto 0);
