@@ -8,6 +8,7 @@ entity background_audio is
 	port(
 		clk : in std_logic;
 		background : in integer range 0 to 5;
+		play_hover, train_hover : IN std_logic;
 		flash_address : out std_logic_vector(21 downto 0);
 		flash_data : in std_logic_vector(15 downto 0);
 		pixel_row, pixel_col, h_count : in std_logic_vector(9 downto 0);
@@ -90,7 +91,26 @@ begin
 			
 		end if;
 	end process;
-	
-	RGB_out <= buff(CONV_INTEGER(pixel_col(9 downto 1)));
 
+	MenuSelector : process( buff, pixel_col, pixel_row, play_hover, train_hover )
+		variable current_RGB_out : std_logic_vector(15 downto 0);
+	begin
+		current_RGB_out := buff(CONV_INTEGER(pixel_col(9 downto 1)));
+
+		if(play_hover = '1') then
+			if(pixel_row <=260 and current_RGB_out = X"FFFF")then
+				RGB_out <= "1101001010110101";
+			else
+				RGB_out <= current_RGB_out;
+			end if;
+		elsif(train_hover = '1') then
+			if(pixel_row >=300 and current_RGB_out = X"FFFF")then
+				RGB_out <= "1101001010110101";
+			else
+				RGB_out <= current_RGB_out;
+			end if;
+		else
+			RGB_out <= current_RGB_out;
+		end if;
+	end process ; -- MenuSelector
 end architecture;
