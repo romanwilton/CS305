@@ -220,12 +220,16 @@ begin
 		5 when level3;
 
 	healthModifier : process( divided_clk )
+		variable prev_streak : std_logic_vector(3 downto 0) := X"0";
 	begin
 		if (rising_edge(divided_clk)) then
 			if (showMenu = '1') then
 				health <= 3;
 			elsif (ai_respawn = '1') then
 				health <= health - 1;
+			elsif (streak_score(0) /= prev_streak and streak_score = (X"0", X"5") and health < 3) then
+				health <= health + 1;
+				prev_streak := streak_score(0);
 			end if;
 		end if;
 	end process ; -- healthModifier
