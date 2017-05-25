@@ -1,6 +1,7 @@
 *
 !.gitignore
 !src/
+!sound_effects/
 !audio/
 !images/
 !combined/
@@ -22,3 +23,4 @@
 !*.wav
 !*.hex
 !*.bat
+!*.txt
