@@ -6,7 +6,7 @@ use work.util.all;
 
 entity background_audio is
 	port(
-		clk : in std_logic;
+		clk, play_effect : in std_logic;
 		background : in integer range 0 to 5;
 		play_hover, train_hover : IN std_logic;
 		flash_address : out std_logic_vector(21 downto 0);
@@ -22,9 +22,15 @@ architecture arch of background_audio is
 	constant sound_length : integer := 320000;
 	constant sound_start : integer := IM_SIZE*6;
 	
+	signal new_sound_fx_value : std_logic := '0';
 	signal buff : pixel(639 downto 0);
 	signal duty : std_logic_vector(9 DOWNTO 0);
+	signal sound_effect_audio : std_logic_vector(7 downto 0);
 begin
+
+	SoundFX : entity work.sound_effect 
+		generic map ("sound_effects/bomb_32k.mif", 18690) 
+		port map (clock => clk, new_value => new_sound_fx_value, reset => play_effect, audio_out => sound_effect_audio);
 
 	process (clk) is
 		variable count : integer range 0 to 420 := 0;
@@ -34,6 +40,8 @@ begin
 		variable flash_address_temp : std_logic_vector(21 downto 0);
 	begin
 		if (rising_edge(clk)) then
+		
+			new_sound_fx_value <= '0';
 		
 			if (h_count = 0) then
 				count := 0;
@@ -71,13 +79,14 @@ begin
 							sound_address := sound_address + 1;
 						end if;	
 						flash_address <= sound_address(21 downto 1) + CONV_STD_LOGIC_VECTOR(sound_start, 22);
+						new_sound_fx_value <= '1';
 					end if;
 					
 					if (count = 2) then
 						if (sound_address(0) = '1') then
-							duty <= "00" & flash_data(15 downto 8);
+							duty <= "00" & flash_data(15 downto 8) + sound_effect_audio - 127;
 						else
-							duty <= "00" & flash_data(7 downto 0);
+							duty <= "00" & flash_data(7 downto 0) + sound_effect_audio - 127;
 						end if;
 					end if;
 
