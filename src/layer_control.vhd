@@ -8,6 +8,7 @@ entity layer_control is
 		NUM_INPUTS : integer := 3
 	);
 	port (
+		show_game_objects : std_logic;
 		layers : IN pixel((NUM_INPUTS - 1) downto 0);
 		RGB_out	: OUT std_logic_vector(11 downto 0)
 	);
@@ -20,7 +21,7 @@ begin
 	begin
 		RGB_out <= X"FA4";
 		for i in NUM_INPUTS-1 downto 0 loop
-			if layers(i)(15) = '1' then
+			if layers(i)(15) = '1' and (i = NUM_INPUTS-1 or show_game_objects = '1') then
 				mif_data := layers(i);
 				RGB_out <= mif_data(14 downto 11) & mif_data(9 downto 6) & mif_data(4 downto 1);
 			end if;
