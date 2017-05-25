@@ -139,7 +139,7 @@ begin
 
 	playClick <= not_bt1;
 	trainClick <= '0';
-	playerDie <= '1' when health = 0 else '0';
+	playerDie <= '1' when health = 0 or timer = (X"F", X"9") else '0';
 
 
 	awfulHardcodedRubbish : process( divided_clk )
