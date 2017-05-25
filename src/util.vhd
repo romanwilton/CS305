@@ -5,6 +5,8 @@ use IEEE.std_logic_arith.all;
 
 package util is
 	type pixel is array (integer range <>) of std_logic_vector(15 downto 0);
+
+	type states is (menu, level1, level2, level3, training, fail, success);
 	
 	type char_array is array (integer range <>) of std_logic_vector(5 downto 0);
 	
