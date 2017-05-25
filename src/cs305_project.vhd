@@ -54,7 +54,7 @@ architecture arch of cs305_project is
 	signal layers : pixel(NUM_LAYERS-1 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
 	signal pixel_row, pixel_col, h_count : std_logic_vector(9 downto 0);
-	signal enable_move : std_logic;
+	signal enable_move, show_game_objects : std_logic;
 	signal background : integer range 0 to 5;
 
 	--User input signals
@@ -121,7 +121,7 @@ begin
 	TimerCounter : entity work.counter generic map (N_STREAK, true, (X"3", X"0")) port map(divided_clk, one_sec_clk, playerWin or playClick or trainClick, timer);
 
 	--User outputs
-	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(layers, RGB_out);
+	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(show_game_objects, layers, RGB_out);
 	SevenSegDecoder1 : entity work.dec_7seg port map(current_score(0), seg0);
 	SevenSegDecoder2 : entity work.dec_7seg port map(current_score(1), seg1);
 	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
@@ -141,8 +141,9 @@ begin
 
 
 	playerDie <= '1' when health = 0 or timer = (X"F", X"9") else '0';
+	start_game <= playerWin or playClick or trainClick or not_bt2;
+	show_game_objects <= '0' when controllerState = menu or controllerState = fail or controllerState = success else '1';
 
-	start_game <= playerWin or playClick or trainClick;
 
 	awfulHardcodedRubbish : process( divided_clk )
 		variable oldLevel : std_logic_vector(1 downto 0);
@@ -222,12 +223,16 @@ begin
 		5 when level3;
 
 	healthModifier : process( divided_clk )
+		variable prev_streak : std_logic_vector(3 downto 0) := X"0";
 	begin
 		if (rising_edge(divided_clk)) then
 			if (showMenu = '1') then
 				health <= 3;
 			elsif (ai_respawn = '1') then
 				health <= health - 1;
+			elsif (streak_score(0) /= prev_streak and streak_score = (X"0", X"5") and health < 3) then
+				health <= health + 1;
+				prev_streak := streak_score(0);
 			end if;
 		end if;
 	end process ; -- healthModifier

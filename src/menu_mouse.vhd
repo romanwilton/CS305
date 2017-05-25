@@ -20,10 +20,12 @@ architecture arch of menu_mouse is
 	constant IMAGE : string := "images/cursor.mif";
 	constant width, height : integer := 10;
 	signal x, y : std_logic_vector(9 downto 0);
+	signal RGB_out_s : std_logic_vector(15 downto 0);
 begin
 	output_drawing : entity work.draw_object generic map (IMAGE, width, height) 
-	port map(clock, pixel_row, pixel_col, x, y, RGB_out);
+	port map(clock, pixel_row, pixel_col, x, y, RGB_out_s);
 
+	RGB_out <= RGB_out_s when state = menu else X"0000";
 
 	process( clock )
 			variable mouse_left_rising_edge, oldvalue : std_logic;
