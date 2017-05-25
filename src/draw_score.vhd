@@ -21,12 +21,13 @@ end entity draw_score;
 
 architecture arch of draw_score is
 
-	constant N_LINES : natural := 4;
+	constant N_LINES : natural := 5;
 	
 	signal character_address : STD_LOGIC_VECTOR (5 DOWNTO 0);
 	signal row, col : STD_LOGIC_VECTOR (2 DOWNTO 0);
 	signal rom_out : std_logic;
 	signal healthStr : char_array(2 downto 0);
+	signal countdownStr : char_array(0 downto 0);
 	
 	signal all_signals, next_pixel_signals : char_signals_array(N_LINES-1 downto 0);
 
@@ -88,6 +89,19 @@ begin
 		str => num2char_array(timer) & string2char_array(" SECONDS REMAINING"),
 		pixel_row => pixel_row, pixel_col => pixel_col,
 		signals => all_signals(3), next_signals => next_pixel_signals(3)
+	);
+	
+	countdownStr(0) <= O"62";
+	
+	LINE5 : entity work.draw_string 
+	generic map (
+		N => 1, x => 320, y => 240, scale_factor => 2
+	)
+	port map (
+		clk => clk,
+		str => countdownStr,
+		pixel_row => pixel_row, pixel_col => pixel_col,
+		signals => all_signals(4), next_signals => next_pixel_signals(4)
 	);
 	
 	next_pixel : process (next_pixel_signals) is

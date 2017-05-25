@@ -5,7 +5,8 @@ use work.util.all;
 
 entity draw_string is
 	generic (
-		N, x, y : in natural
+		N, x, y : in natural;
+		scale_factor : in natural := 0
 	);
 	port (
 		clk : in std_logic;
@@ -25,7 +26,7 @@ begin
 	GEN : for i in (N-1) downto 0 generate
 		CHARACTER_DRAW : entity work.draw_character
 		generic map (
-			x => x + (N-1-i)*8, y => y
+			x => x + (N-1-i)*8, y => y, scale_factor => scale_factor
 		)
 		port map (
 			char => str(i),
@@ -35,7 +36,7 @@ begin
 		
 		CHARACTER_DRAW_NEXT : entity work.draw_character
 		generic map (
-			x => x + (N-1-i)*8, y => y
+			x => x + (N-1-i)*8, y => y, scale_factor => scale_factor
 		)
 		port map (
 			char => str(i),
