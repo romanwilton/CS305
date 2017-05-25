@@ -13,7 +13,7 @@ entity draw_score is
 		score : in N_digit_num(SCORE_N-1 downto 0);
 		streak : in N_digit_num(STREAK_N-1 downto 0);
 		timer : in N_digit_num(TIMER_N-1 downto 0);
-		health : in integer range 0 to 3;
+		health, countdown : in integer range 0 to 3;
 		pixel_row, pixel_col : in std_logic_vector(9 downto 0);
 		colour_out : out std_logic_vector(15 downto 0)
 	);
@@ -91,7 +91,7 @@ begin
 		signals => all_signals(3), next_signals => next_pixel_signals(3)
 	);
 	
-	countdownStr(0) <= O"62";
+	countdownStr(0) <= O"60" + CONV_STD_LOGIC_VECTOR(countdown, 4) when countdown > 0 else O"40";
 	
 	LINE5 : entity work.draw_string 
 	generic map (
