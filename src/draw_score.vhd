@@ -6,12 +6,13 @@ use work.util.all;
 
 entity draw_score is
 	generic (
-		SCORE_N, STREAK_N : integer := 2
+		SCORE_N, STREAK_N, TIMER_N : integer := 2
 	);
 	port(
 		clk : in std_logic;
 		score : in N_digit_num(SCORE_N-1 downto 0);
 		streak : in N_digit_num(STREAK_N-1 downto 0);
+		timer : in N_digit_num(TIMER_N-1 downto 0);
 		health : in integer range 0 to 3;
 		pixel_row, pixel_col : in std_logic_vector(9 downto 0);
 		colour_out : out std_logic_vector(15 downto 0)
@@ -20,14 +21,14 @@ end entity draw_score;
 
 architecture arch of draw_score is
 
-	constant N_LINES : natural := 3;
+	constant N_LINES : natural := 4;
 	
 	signal character_address : STD_LOGIC_VECTOR (5 DOWNTO 0);
 	signal row, col : STD_LOGIC_VECTOR (2 DOWNTO 0);
 	signal rom_out : std_logic;
 	signal healthStr : char_array(2 downto 0);
 	
-	signal all_signals, next_pixel_signals : char_signals_array(2 downto 0);
+	signal all_signals, next_pixel_signals : char_signals_array(N_LINES-1 downto 0);
 
 begin
 
@@ -76,6 +77,17 @@ begin
 		str => string2char_array("HEALTH = ") & healthStr,
 		pixel_row => pixel_row, pixel_col => pixel_col,
 		signals => all_signals(2), next_signals => next_pixel_signals(2)
+	);
+	
+	LINE4 : entity work.draw_string 
+	generic map (
+		N => 18+timer'length, x => 640/2-(18+timer'length)*8/2, y => 10
+	)
+	port map (
+		clk => clk,
+		str => num2char_array(timer) & string2char_array(" SECONDS REMAINING"),
+		pixel_row => pixel_row, pixel_col => pixel_col,
+		signals => all_signals(3), next_signals => next_pixel_signals(3)
 	);
 	
 	next_pixel : process (next_pixel_signals) is
