@@ -37,9 +37,9 @@ architecture arch of cs305_project is
 		);
 	end component rand_gen;
 
--------------------------------------------------------------------------------
------------------------------Signal Definitions--------------------------------
--------------------------------------------------------------------------------
+	-------------------------------------------------------------------------------
+	-----------------------------Signal Definitions--------------------------------
+	-------------------------------------------------------------------------------
 
 	--System signals
 	signal divided_clk : std_logic;
@@ -80,21 +80,22 @@ architecture arch of cs305_project is
 	signal playClick, trainClick : std_logic;
 	signal showMenu, trainingMode : std_logic;
 	signal level : std_logic_vector(1 downto 0);
+	signal controllerState : states;
 
 	--TODO remove this when menu is actually implemented
 	signal temp_red_out : std_logic_vector(3 downto 0);
 	signal ded : std_logic;
 
--------------------------------------------------------------------------------
----------------------------Signal Definitions End------------------------------
--------------------------------------------------------------------------------
+	-------------------------------------------------------------------------------
+	---------------------------Signal Definitions End------------------------------
+	-------------------------------------------------------------------------------
 
 	
 begin
 
--------------------------------------------------------------------------------
-----------------------------Entity Instantiations------------------------------
--------------------------------------------------------------------------------
+	-------------------------------------------------------------------------------
+	----------------------------Entity Instantiations------------------------------
+	-------------------------------------------------------------------------------
 
 	--Helper blocks
 	ClockDivider : entity work.clock_div port map(clk, divided_clk);
@@ -103,7 +104,7 @@ begin
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	
 	--FSMs
-	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, showMenu, trainingMode, level);
+	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, showMenu, trainingMode, level, controllerState);
 	GameFSM : entity work.fsm port map(divided_clk, showMenu, not_bt2, shoot_signal, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
 	
 	--Game objects
@@ -129,9 +130,9 @@ begin
 		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, ai_tank_hit, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
 	end generate TANK_GEN;
 
--------------------------------------------------------------------------------
---------------------------Entity Instantiations End----------------------------
--------------------------------------------------------------------------------
+	-------------------------------------------------------------------------------
+	--------------------------Entity Instantiations End----------------------------
+	-------------------------------------------------------------------------------
 
 	playClick <= not_bt1;
 	trainClick <= '0';
@@ -205,8 +206,15 @@ begin
 	led(3) <= showMenu;
 	led(4) <= ai_reset;
 	led(5) <= playerWin;
-	
-	background <= 1 when sw0 = '1' else 0;
+
+	with controllerState select background <=
+		0 when menu,
+		1 when success,
+		2 when fail,
+		3 when level1,
+		3 when training,
+		4 when level2,
+		5 when level3;
 
 	healthModifier : process( divided_clk )
 	begin

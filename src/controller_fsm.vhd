@@ -1,17 +1,18 @@
 LIBRARY IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
+use work.util.all;
 
 entity controller_fsm is
 	port (
 		clock, play, train, win, die, mouse_left : IN std_logic;
 		show_menu, trainingMode : OUT std_logic;
-		level : OUT std_logic_vector(1 downto 0)
+		level : OUT std_logic_vector(1 downto 0);
+		state_out : OUT states
 	);
 end entity controller_fsm;
 
 architecture arch of controller_fsm is
-	type states is (menu, level1, level2, level3, training, fail, success);
 	signal state : states := menu;
 	signal next_state : states;
 begin
@@ -105,4 +106,5 @@ begin
 		end case;
 	end process output_logic;
 
+state_out <= state;
 end architecture arch;
