@@ -5,7 +5,7 @@ use work.util.all;
 
 entity controller_fsm is
 	port (
-		clock, play, train, win, die, mouse_left : IN std_logic;
+		clock, play, train, win, die, mouse_left, reset : IN std_logic;
 		show_menu, trainingMode : OUT std_logic;
 		level : OUT std_logic_vector(1 downto 0);
 		state_out : OUT states
@@ -36,7 +36,9 @@ begin
 					next_state <= menu;
 				end if;
 			when level1 =>
-				if (win = '1') then
+				if (reset = '1') then
+					next_state <= menu;
+				elsif (win = '1') then
 					next_state <= level2;
 				elsif (die = '1') then
 					next_state <= fail;
@@ -44,7 +46,9 @@ begin
 					next_state <= level1;
 				end if;
 			when level2 =>
-				if (win = '1') then
+				if (reset = '1') then
+					next_state <= menu;
+				elsif (win = '1') then
 					next_state <= level3;
 				elsif (die = '1') then
 					next_state <= fail;
@@ -52,7 +56,9 @@ begin
 					next_state <= level2;
 				end if;
 			when level3 =>
-				if (win = '1') then
+				if (reset = '1') then
+					next_state <= menu;
+				elsif (win = '1') then
 					next_state <= success;
 				elsif (die = '1') then
 					next_state <= fail;
@@ -60,19 +66,21 @@ begin
 					next_state <= level3;
 				end if;
 			when training =>
-				if (die = '1') then
+				if (reset = '1') then
+					next_state <= menu;
+				elsif (die = '1') then
 					next_state <= menu;
 				else
 					next_state <= training;
 				end if;
 			when fail =>
-				if (mouse_left = '1') then
+				if (mouse_left = '1' or reset = '1') then
 					next_state <= menu;
 				else
 					next_state <= fail;
 				end if;
 			when success =>
-				if (mouse_left = '1') then
+				if (mouse_left = '1' or reset = '1') then
 					next_state <= menu;
 				else
 					next_state <= success;

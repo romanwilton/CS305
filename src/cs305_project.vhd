@@ -108,7 +108,7 @@ begin
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
 	
 	--FSMs
-	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, showMenu, trainingMode, level, controllerState);
+	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, not_bt2, showMenu, trainingMode, level, controllerState);
 	GameFSM : entity work.fsm port map(divided_clk, showMenu, start_game, shoot_signal, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
 	
 	--Game objects
@@ -117,7 +117,7 @@ begin
 	menuMouse : entity work.menu_mouse port map(divided_clk, left_button, enable_move, controllerState, mouse_x_location, mouse_y_location, pixel_row, pixel_col, play_hover, playClick, train_hover, trainClick, layers(N_AI_TANK+0));
 
 	--Counters
-	ScoreCounter : entity work.counter generic map (N_SCORE, false, (X"0", X"0", X"0")) port map(divided_clk, ai_tank_hit, '0', current_score);
+	ScoreCounter : entity work.counter generic map (N_SCORE, false, (X"0", X"0", X"0")) port map(divided_clk, ai_tank_hit, playClick or trainClick, current_score);
 	StreakCounter : entity work.counter generic map (N_STREAK, false, (X"0", X"0")) port map(divided_clk, ai_tank_hit, off_screen OR ai_respawn, streak_score);
 	TimerCounter : entity work.counter generic map (N_STREAK, true, (X"3", X"0")) port map(divided_clk, one_sec_clk, timerReset, timer);
 
