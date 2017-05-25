@@ -59,6 +59,7 @@ architecture arch of cs305_project is
 
 	--User input signals
 	signal left_button, right_button, not_bt2, not_bt1 : std_logic;
+	signal start_game : std_logic;
 
 	--gameFSM outputs
 	signal bullet_shot, ai_tank_hit : std_logic;
@@ -107,7 +108,7 @@ begin
 	
 	--FSMs
 	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, showMenu, trainingMode, level, controllerState);
-	GameFSM : entity work.fsm port map(divided_clk, showMenu, not_bt2, shoot_signal, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
+	GameFSM : entity work.fsm port map(divided_clk, showMenu, start_game, shoot_signal, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
 	
 	--Game objects
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+2));
@@ -141,6 +142,7 @@ begin
 
 	playerDie <= '1' when health = 0 or timer = (X"F", X"9") else '0';
 
+	start_game <= playerWin or playClick or trainClick;
 
 	awfulHardcodedRubbish : process( divided_clk )
 		variable oldLevel : std_logic_vector(1 downto 0);
