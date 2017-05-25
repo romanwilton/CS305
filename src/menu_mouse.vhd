@@ -36,29 +36,30 @@ begin
 				y <= mouse_y;
 			end if;
 
-			if (oldvalue /= mouse_left) and mouse_left = '1' and state = menu then
+			if (oldvalue /= mouse_left) and mouse_left = '1' then
 				mouse_left_rising_edge := '1';
 			else
 				mouse_left_rising_edge := '0';
 			end if;
 			oldvalue := mouse_left;
 
+			train_hover <= '0';
+			train_click <= '0';
+			play_hover <= '0';
+			play_click <= '0';
 
-			if(mouse_y >= 160 and mouse_y < 260 and mouse_x >= 200 and mouse_x < 460) then
-				play_hover <= '1';
-				train_hover <= '0';
-				if(mouse_left_rising_edge = '1') then
-					play_click <= '1';
-				else
-					play_click <= '0';
-				end if;
-			elsif(mouse_y >= 300 and mouse_y < 400 and mouse_x >= 180 and mouse_x < 500) then
-				train_hover <= '1';
-				play_hover <= '0';
-				if(mouse_left_rising_edge = '1') then
-					train_click <= '1';
-				else
-					train_click <= '0';
+
+			if(state = menu) then
+				if(mouse_y >= 160 and mouse_y < 260 and mouse_x >= 200 and mouse_x < 460) then
+					play_hover <= '1';
+					if(mouse_left_rising_edge = '1') then
+						play_click <= '1';
+					end if;
+				elsif(mouse_y >= 300 and mouse_y < 400 and mouse_x >= 180 and mouse_x < 500) then
+					train_hover <= '1';
+					if(mouse_left_rising_edge = '1') then
+						train_click <= '1';
+					end if;
 				end if;
 			end if;
 		end if;
