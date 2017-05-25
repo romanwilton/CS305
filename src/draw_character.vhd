@@ -5,7 +5,8 @@ use work.util.all;
 
 entity draw_character is
 	generic (
-		x, y : in natural
+		x, y : in natural;
+		scale_factor : in natural
 	);
 	port (
 		char : in std_logic_vector(5 downto 0);
@@ -21,13 +22,13 @@ begin
 		variable col_v, row_v : STD_LOGIC_VECTOR(9 DOWNTO 0);
 	begin
 		signals <= char_signals_zero;
-		if (pixel_col >= x and pixel_col < (x + 8)) then
-			if (pixel_row >= y and pixel_row < (y + 8)) then
+		if (pixel_col >= x and pixel_col < (x + 8*2**scale_factor)) then
+			if (pixel_row >= y and pixel_row < (y + 8*2**scale_factor)) then
 				signals.character_address <= char;
 				col_v := pixel_col - x;
-				signals.font_col <= col_v(2 downto 0);
+				signals.font_col <= col_v(2+scale_factor downto scale_factor);
 				row_v := pixel_row - y;
-				signals.font_row <= row_v(2 downto 0);
+				signals.font_row <= row_v(2+scale_factor downto scale_factor);
 				signals.enable <= '1';
 			end if;
 		end if;

@@ -59,7 +59,7 @@ architecture arch of cs305_project is
 
 	--User input signals
 	signal left_button, right_button, not_bt2, not_bt1 : std_logic;
-	signal start_game : std_logic;
+	signal start_game, timerReset : std_logic;
 
 	--gameFSM outputs
 	signal bullet_shot, ai_tank_hit : std_logic;
@@ -67,7 +67,7 @@ architecture arch of cs305_project is
 
 	--AI tanks signals
 	signal start_tank, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
-	signal bullet_collision, ai_win : std_logic := '0';
+	signal bullet_collision, ai_win, tank_move : std_logic := '0';
 
 	--Bullet signals
 	signal off_screen, shoot_signal : std_logic;
@@ -77,6 +77,7 @@ architecture arch of cs305_project is
 	signal streak_score : N_digit_num(N_STREAK-1 downto 0);
 	signal timer : N_digit_num(N_TIMER-1 downto 0);
 	signal health : integer range 0 to 3 := 3;
+	signal countdown : integer range 0 to 3 := 3;
 	
 	--Menu/controller states
 	signal playerWin, playerDie : std_logic;
@@ -118,7 +119,7 @@ begin
 	--Counters
 	ScoreCounter : entity work.counter generic map (N_SCORE, false, (X"0", X"0", X"0")) port map(divided_clk, ai_tank_hit, '0', current_score);
 	StreakCounter : entity work.counter generic map (N_STREAK, false, (X"0", X"0")) port map(divided_clk, ai_tank_hit, off_screen OR ai_respawn, streak_score);
-	TimerCounter : entity work.counter generic map (N_STREAK, true, (X"3", X"0")) port map(divided_clk, one_sec_clk, playerWin or playClick or trainClick, timer);
+	TimerCounter : entity work.counter generic map (N_STREAK, true, (X"3", X"0")) port map(divided_clk, one_sec_clk, timerReset, timer);
 
 	--User outputs
 	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(show_game_objects, layers, RGB_out);
@@ -127,12 +128,12 @@ begin
 	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
 	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col, h_count);
-	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK, N_TIMER) port map (divided_clk, current_score, streak_score, timer, health, pixel_row, pixel_col, layers(N_AI_TANK+3));
+	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK, N_TIMER) port map (divided_clk, current_score, streak_score, timer, health, countdown, pixel_row, pixel_col, layers(N_AI_TANK+3));
 	BackgroundAndAudio : entity work.background_audio port map (divided_clk, background, play_hover, train_hover, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+4), audio_out);
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
-		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, ai_tank_hit, enable_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
+		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*2) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, ai_tank_hit, tank_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
 	end generate TANK_GEN;
 
 	-------------------------------------------------------------------------------
@@ -141,9 +142,10 @@ begin
 
 
 	playerDie <= '1' when health = 0 or timer = (X"F", X"9") else '0';
-	start_game <= playerWin or playClick or trainClick or not_bt2;
+	start_game <= '1' when playerWin = '1' or countdown = 0 else '0';
 	show_game_objects <= '0' when controllerState = menu or controllerState = fail or controllerState = success else '1';
-
+	tank_move <= '1' when enable_move = '1' and countdown = 0 else '0';
+	timerReset <= '1' when playerWin = '1' or countdown > 0 else '0';
 
 	awfulHardcodedRubbish : process( divided_clk )
 		variable oldLevel : std_logic_vector(1 downto 0);
@@ -172,6 +174,22 @@ begin
 		end if;
 	end process ; -- awfulHardcodedRubbish
 
+	count_down : process (divided_clk) is
+		variable count : integer range 0 to 25000000;
+	begin
+		if rising_edge(divided_clk) then
+			if (playClick = '1') then
+				countdown <= 3;
+				count := 0;
+			elsif (countdown > 0) then
+				count := count + 1;
+				if (count = 25000000) then
+					countdown <= countdown - 1;
+					count := 0;
+				end if;
+			end if;
+		end if;
+	end process count_down;
 
 	rightClickRisingEdge : process( divided_clk )
 		variable oldvalue : std_logic;
