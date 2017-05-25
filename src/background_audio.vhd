@@ -30,7 +30,7 @@ begin
 
 	SoundFX : entity work.sound_effect 
 		generic map ("sound_effects/bomb_32k.mif", 18690) 
-		port map (clock => clk, new_value => new_sound_fx_value, reset => play_effect, audio_out => sound_effect_audio);
+		port map (clock => clk, new_value => new_sound_fx_value, play => play_effect, audio_out => sound_effect_audio);
 
 	process (clk) is
 		variable count : integer range 0 to 420 := 0;

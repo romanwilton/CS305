@@ -129,7 +129,7 @@ begin
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
 	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col, h_count);
 	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK, N_TIMER) port map (divided_clk, current_score, streak_score, timer, health, countdown, pixel_row, pixel_col, layers(N_AI_TANK+3));
-	BackgroundAndAudio : entity work.background_audio port map (divided_clk, sw0, background, play_hover, train_hover, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+4), audio_out);
+	BackgroundAndAudio : entity work.background_audio port map (divided_clk, bullet_collision, background, play_hover, train_hover, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+4), audio_out);
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate

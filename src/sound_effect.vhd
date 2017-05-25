@@ -10,7 +10,7 @@ entity sound_effect is
 		sound_length : integer
 	);
 	port (
-  		clock, new_value, reset : in std_logic;
+  		clock, new_value, play : in std_logic;
   		audio_out : out std_logic_vector(7 downto 0)
 	);
 end entity sound_effect;
@@ -69,17 +69,25 @@ begin
 		address_a => rom_address,
 		q_a => rom_out
 	);
-
-	audio_out <= rom_out when reset = '0' else X"7F";
 	
-	address : process (clock) is
+	address : process (clock, new_value) is
+		variable playing : boolean := false;
 	begin
 		if (rising_edge(clock)) then
+			if (play = '1') then
+				playing := true;
+			end if;
 			if (new_value = '1') then
-				if rom_address + 1 = sound_length or reset = '1' then
-					rom_address <= (others => '0');
+				if (playing) then
+					if rom_address + 1 = sound_length then
+						rom_address <= (others => '0');
+						playing := false;
+					else
+						rom_address <= rom_address + 1;
+					end if;
+					audio_out <= rom_out;
 				else
-					rom_address <= rom_address + 1;
+					audio_out <= X"7F";
 				end if;
 			end if;
 		end if;
