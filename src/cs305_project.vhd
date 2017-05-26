@@ -43,7 +43,7 @@ architecture arch of cs305_project is
 	-------------------------------------------------------------------------------
 
 	--System signals
-	signal divided_clk, one_sec_clk : std_logic;
+	signal divided_clk, one_sec_clk, paused_clk : std_logic;
 	signal s_flash_address : std_logic_vector(21 downto 0);
 
 	--Position signals
@@ -54,12 +54,13 @@ architecture arch of cs305_project is
 	signal layers : pixel(NUM_LAYERS-1 downto 0);
 	signal RGB_out : std_logic_vector(11 downto 0);
 	signal pixel_row, pixel_col, h_count : std_logic_vector(9 downto 0);
-	signal enable_move, show_game_objects : std_logic;
+	signal enable_move, enable_move_signal, show_game_objects : std_logic;
 	signal background : integer range 0 to 5;
 
 	--User input signals
 	signal left_button, right_button, not_bt2, not_bt1 : std_logic;
 	signal start_game, timerReset : std_logic;
+	signal pause : std_logic;
 
 	--gameFSM outputs
 	signal bullet_shot, ai_tank_hit : std_logic;
@@ -109,17 +110,17 @@ begin
 	
 	--FSMs
 	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, not_bt2, showMenu, trainingMode, level, controllerState);
-	GameFSM : entity work.fsm port map(divided_clk, showMenu, start_game, shoot_signal, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
+	GameFSM : entity work.fsm port map(divided_clk, showMenu, start_game, shoot_signal and not pause, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
 	
 	--Game objects
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+2));
 	UserBullet : entity work.bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(N_AI_TANK+1));
-	menuMouse : entity work.menu_mouse port map(divided_clk, left_button, enable_move, controllerState, mouse_x_location, mouse_y_location, pixel_row, pixel_col, play_hover, playClick, train_hover, trainClick, layers(N_AI_TANK+0));
+	menuMouse : entity work.menu_mouse port map(divided_clk, left_button, enable_move_signal, controllerState, mouse_x_location, mouse_y_location, pixel_row, pixel_col, play_hover, playClick, train_hover, trainClick, layers(N_AI_TANK+0));
 
 	--Counters
-	ScoreCounter : entity work.counter generic map (N_SCORE, false, (X"0", X"0", X"0")) port map(divided_clk, ai_tank_hit, playClick or trainClick, current_score);
-	StreakCounter : entity work.counter generic map (N_STREAK, false, (X"0", X"0")) port map(divided_clk, ai_tank_hit, off_screen OR ai_respawn, streak_score);
-	TimerCounter : entity work.counter generic map (N_STREAK, true, (X"3", X"0")) port map(divided_clk, one_sec_clk, timerReset, timer);
+	ScoreCounter : entity work.counter generic map (N_SCORE, false, (X"0", X"0", X"0")) port map(divided_clk, ai_tank_hit, playClick OR trainClick, current_score);
+	StreakCounter : entity work.counter generic map (N_STREAK, false, (X"0", X"0")) port map(divided_clk, ai_tank_hit, off_screen OR ai_respawn OR playClick OR trainClick, streak_score);
+	TimerCounter : entity work.counter generic map (N_STREAK, true, (X"3", X"0")) port map(divided_clk, paused_clk, timerReset, timer);
 
 	--User outputs
 	LayerControl : entity work.layer_control generic map (NUM_LAYERS) port map(show_game_objects, layers, RGB_out);
@@ -127,7 +128,7 @@ begin
 	SevenSegDecoder2 : entity work.dec_7seg port map(current_score(1), seg1);
 	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
-	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move, pixel_row, pixel_col, h_count);
+	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move_signal, pixel_row, pixel_col, h_count);
 	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK, N_TIMER) port map (divided_clk, current_score, streak_score, timer, health, countdown, pixel_row, pixel_col, layers(N_AI_TANK+3));
 	BackgroundAndAudio : entity work.background_audio port map (divided_clk, bullet_collision, background, play_hover, train_hover, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+4), audio_out);
 	
@@ -146,6 +147,9 @@ begin
 	show_game_objects <= '0' when controllerState = menu or controllerState = fail or controllerState = success else '1';
 	tank_move <= '1' when enable_move = '1' and countdown = 0 else '0';
 	timerReset <= '1' when playerWin = '1' or countdown > 0 else '0';
+	enable_move <= '1' when enable_move_signal = '1' and pause = '0' else '0';
+	paused_clk <= one_sec_clk and not pause;
+	pause <= sw0;
 
 	awfulHardcodedRubbish : process( divided_clk )
 		variable oldLevel : std_logic_vector(1 downto 0);
@@ -181,7 +185,7 @@ begin
 			if (playClick = '1') then
 				countdown <= 3;
 				count := 0;
-			elsif (countdown > 0) then
+			elsif (countdown > 0 and pause = '0') then
 				count := count + 1;
 				if (count = 25000000) then
 					countdown <= countdown - 1;
