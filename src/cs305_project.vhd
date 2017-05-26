@@ -196,15 +196,20 @@ begin
 	end process count_down;
 
 	rightClickRisingEdge : process( divided_clk )
-		variable oldvalue : std_logic;
+		variable oldvalue : N_digit_num(2 downto 0);
 	begin
 		if(rising_edge(divided_clk)) then
-			if (oldvalue /= right_button) and right_button = '1' then
-				playerWin <= '1';
-			else
-				playerWin <= '0';
+			playerWin <= '0';
+			if (oldvalue /= current_score) then
+				if(current_score = (X"0", X"1", X"0")) then
+					playerWin <= '1';
+				elsif(current_score = (X"0", X"2", X"0")) then
+					playerWin <= '1';
+				elsif(current_score = (X"0", X"3", X"0")) then
+					playerWin <= '1';
+				end if;
 			end if;
-			oldvalue := right_button;
+			oldvalue := current_score;
 		end if;
 	end process ; -- rightClickRisingEdge
 
