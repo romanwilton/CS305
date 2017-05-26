@@ -24,7 +24,7 @@ begin
 		end if;
 	end process progress_state;
 
-	next_state_logic : process (state, play, train, win, die, mouse_left) is
+	next_state_logic : process (state, play, train, win, die, mouse_left, reset) is
 	begin
 		case state is
 			when menu =>
