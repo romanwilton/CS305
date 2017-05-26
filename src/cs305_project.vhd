@@ -23,7 +23,7 @@ end entity cs305_project;
 architecture arch of cs305_project is
 
 	constant N_AI_TANK : integer := 3;
-	constant NUM_LAYERS : integer := N_AI_TANK + 5;
+	constant NUM_LAYERS : integer := N_AI_TANK + 6;
 	constant N_SCORE : integer := 3;
 	constant N_STREAK : integer := 2;
 	constant N_TIMER : integer := 2;
@@ -114,9 +114,9 @@ begin
 	GameFSM : entity work.fsm port map(divided_clk, showMenu, start_game, shoot_signal and not pause, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
 	
 	--Game objects
-	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+2));
-	UserBullet : entity work.bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(N_AI_TANK+1));
-	menuMouse : entity work.menu_mouse port map(divided_clk, left_button, enable_move, controllerState, mouse_x_location, mouse_y_location, pixel_row, pixel_col, play_hover, playClick, train_hover, trainClick, layers(N_AI_TANK+0));
+	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+3));
+	UserBullet : entity work.bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(N_AI_TANK+2));
+	menuMouse : entity work.menu_mouse port map(divided_clk, left_button, enable_move, controllerState, mouse_x_location, mouse_y_location, pixel_row, pixel_col, play_hover, playClick, train_hover, trainClick, layers(N_AI_TANK+1));
 
 	--Counters
 	ScoreCounter : entity work.counter generic map (N_SCORE, false, (X"0", X"0", X"0")) port map(divided_clk, ai_tank_hit, playClick OR trainClick, current_score);
@@ -130,12 +130,13 @@ begin
 	SevenSegDecoder3 : entity work.dec_7seg port map(current_score(2), seg2);
 	SevenSegDecoder4 : entity work.dec_7seg port map("0000", seg3);
 	DisplayControl : entity work.VGA_SYNC port map(divided_clk, RGB_out(11 downto 8), RGB_out(7 downto 4), RGB_out(3 downto 0), red_out, green_out, blue_out, horiz_sync_out, vert_sync_out, enable_move_signal, pixel_row, pixel_col, h_count);
-	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK, N_TIMER) port map (divided_clk, current_score, streak_score, timer, health, countdown, pixel_row, pixel_col, layers(N_AI_TANK+3));
-	BackgroundAndAudio : entity work.background_audio port map (divided_clk, bullet_collision, background, play_hover, train_hover, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+4), audio_out);
+	DrawScore : entity work.draw_score generic map (N_SCORE, N_STREAK, N_TIMER) port map (divided_clk, current_score, streak_score, timer, health, countdown, pixel_row, pixel_col, layers(N_AI_TANK+4));
+	ShowPause : entity work.draw_pause port map (divided_clk, pause, pixel_row, pixel_col, layers(0));
+	BackgroundAndAudio : entity work.background_audio port map (divided_clk, bullet_collision, background, play_hover, train_hover, s_flash_address, flash_data, pixel_row, pixel_col, h_count, layers(N_AI_TANK+5), audio_out);
 	
 	--AI generation
 	TANK_GEN: for i in 0 to N_AI_TANK-1 generate
-		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*4) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, ai_tank_hit, tank_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i));
+		AiTank : entity work.ai_tank generic map (AI_IMAGES(i), (i+1)*4) port map (divided_clk, start_tank(i), ai_reset, ai_respawn, ai_tank_hit, tank_move, pixel_row, pixel_col, random_pos, bullet_x_pos, bullet_y_pos, collisions_out(i), wins_out(i), layers(i+1));
 	end generate TANK_GEN;
 
 	-------------------------------------------------------------------------------
