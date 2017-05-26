@@ -55,7 +55,7 @@ architecture arch of cs305_project is
 	signal RGB_out : std_logic_vector(11 downto 0);
 	signal pixel_row, pixel_col, h_count : std_logic_vector(9 downto 0);
 	signal enable_move, enable_move_signal, show_game_objects : std_logic;
-	signal background : integer range 0 to 5;
+	signal background : integer range 0 to 6;
 
 	--User input signals
 	signal left_button, right_button, not_bt2, not_bt1 : std_logic;
@@ -246,7 +246,7 @@ begin
 		1 when success,
 		2 when fail,
 		3 when level1,
-		3 when training,
+		6 when training,
 		4 when level2,
 		5 when level3;
 

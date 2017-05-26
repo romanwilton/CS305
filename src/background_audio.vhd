@@ -7,7 +7,7 @@ use work.util.all;
 entity background_audio is
 	port(
 		clk, play_effect : in std_logic;
-		background : in integer range 0 to 5;
+		background : in integer range 0 to 6;
 		play_hover, train_hover : IN std_logic;
 		flash_address : out std_logic_vector(21 downto 0);
 		flash_data : in std_logic_vector(15 downto 0);
@@ -19,8 +19,8 @@ end entity;
 
 architecture arch of background_audio is
 	constant IM_SIZE : integer := 320*240;
-	constant sound_length : integer := 1120000;
-	constant sound_start : integer := IM_SIZE*6;
+	constant sound_length : integer := 1120000-IM_SIZE;
+	constant sound_start : integer := IM_SIZE*7;
 	
 	signal new_sound_fx_value : std_logic := '0';
 	signal buff : pixel(639 downto 0);
