@@ -107,6 +107,7 @@ begin
 	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, mouse_y_location, mouse_x_location);
 	MouseDebouncer : entity work.debounce port map(divided_clk, left_button, shoot_signal);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
+	PauseController : entity work.pause_toggle port map(divided_clk, not_bt1, showMenu, pause);
 	
 	--FSMs
 	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, not_bt2, showMenu, trainingMode, level, controllerState);
@@ -115,7 +116,7 @@ begin
 	--Game objects
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+2));
 	UserBullet : entity work.bullet port map(divided_clk, bullet_shot, enable_move, pixel_row, pixel_col, user_location, off_screen, bullet_x_pos, bullet_y_pos, layers(N_AI_TANK+1));
-	menuMouse : entity work.menu_mouse port map(divided_clk, left_button, enable_move_signal, controllerState, mouse_x_location, mouse_y_location, pixel_row, pixel_col, play_hover, playClick, train_hover, trainClick, layers(N_AI_TANK+0));
+	menuMouse : entity work.menu_mouse port map(divided_clk, left_button, enable_move, controllerState, mouse_x_location, mouse_y_location, pixel_row, pixel_col, play_hover, playClick, train_hover, trainClick, layers(N_AI_TANK+0));
 
 	--Counters
 	ScoreCounter : entity work.counter generic map (N_SCORE, false, (X"0", X"0", X"0")) port map(divided_clk, ai_tank_hit, playClick OR trainClick, current_score);
@@ -149,7 +150,6 @@ begin
 	timerReset <= '1' when playerWin = '1' or countdown > 0 else '0';
 	enable_move <= '1' when enable_move_signal = '1' and pause = '0' else '0';
 	paused_clk <= one_sec_clk and not pause;
-	pause <= sw0;
 
 	awfulHardcodedRubbish : process( divided_clk )
 		variable oldLevel : std_logic_vector(1 downto 0);
