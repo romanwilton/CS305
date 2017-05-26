@@ -26,7 +26,7 @@ begin
 	GEN : for i in (N-1) downto 0 generate
 		CHARACTER_DRAW : entity work.draw_character
 		generic map (
-			x => x + (N-1-i)*8, y => y, scale_factor => scale_factor
+			x => x + (N-1-i)*8*2**scale_factor, y => y, scale_factor => scale_factor
 		)
 		port map (
 			char => str(i),
@@ -36,7 +36,7 @@ begin
 		
 		CHARACTER_DRAW_NEXT : entity work.draw_character
 		generic map (
-			x => x + (N-1-i)*8, y => y, scale_factor => scale_factor
+			x => x + (N-1-i)*8*2**scale_factor, y => y, scale_factor => scale_factor
 		)
 		port map (
 			char => str(i),
