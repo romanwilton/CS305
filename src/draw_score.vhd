@@ -95,7 +95,7 @@ begin
 	
 	LINE5 : entity work.draw_string 
 	generic map (
-		N => 1, x => 320, y => 240, scale_factor => 2
+		N => 1, x => 640/2-4*2**3, y => 480/2-4*2**3, scale_factor => 3
 	)
 	port map (
 		clk => clk,
@@ -126,6 +126,6 @@ begin
 		end loop;
 	end process column;
 	
-	colour_out <= "1000000000011111" when rom_out = '1' else X"0000";
+	colour_out <= "1000000000000000" when rom_out = '1' else X"0000";
 	
 end architecture arch;
