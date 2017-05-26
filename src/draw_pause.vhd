@@ -58,6 +58,6 @@ begin
 		end loop;
 	end process column;
 	
-	colour_out <= X"FFFF" when rom_out = '1' else X"0000";
+	colour_out <= X"FFFF" when rom_out = '1' and enabled = '1' else X"0000";
 	
 end architecture arch;
