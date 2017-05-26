@@ -148,7 +148,7 @@ begin
 	start_game <= '1' when playerWin = '1' or countdown = 0 else '0';
 	show_game_objects <= '0' when controllerState = menu or controllerState = fail or controllerState = success else '1';
 	tank_move <= '1' when enable_move = '1' and countdown = 0 else '0';
-	timerReset <= '1' when playerWin = '1' or countdown > 0 else '0';
+	timerReset <= '1' when (playerWin = '1' and controllerState /= training) or countdown > 0 else '0';
 	enable_move <= '1' when enable_move_signal = '1' and pause = '0' else '0';
 	paused_clk <= one_sec_clk and not pause;
 
@@ -183,7 +183,7 @@ begin
 		variable count : integer range 0 to 25000000;
 	begin
 		if rising_edge(divided_clk) then
-			if (playClick = '1') then
+			if (playClick = '1' or trainClick = '1') then
 				countdown <= 3;
 				count := 0;
 			elsif (countdown > 0 and pause = '0') then
