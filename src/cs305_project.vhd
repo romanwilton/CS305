@@ -68,7 +68,7 @@ architecture arch of cs305_project is
 
 	--AI tanks signals
 	signal start_tank, collisions_out, wins_out : std_logic_vector(N_AI_TANK-1 downto 0) := (others => '0');
-	signal bullet_collision, ai_win, tank_move : std_logic := '0';
+	signal bullet_collision, ai_win, ai_died, tank_move : std_logic := '0';
 
 	--Bullet signals
 	signal off_screen, shoot_signal : std_logic;
@@ -87,9 +87,6 @@ architecture arch of cs305_project is
 	signal showMenu, trainingMode : std_logic;
 	signal level : std_logic_vector(1 downto 0);
 	signal controllerState : states;
-
-	--TODO remove this when menu is actually implemented
-	signal ded : std_logic;
 
 	-------------------------------------------------------------------------------
 	---------------------------Signal Definitions End------------------------------
@@ -111,7 +108,7 @@ begin
 	
 	--FSMs
 	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, not_bt2, showMenu, trainingMode, level, controllerState);
-	GameFSM : entity work.fsm port map(divided_clk, showMenu, start_game, shoot_signal and not pause, off_screen, bullet_collision, ded, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
+	GameFSM : entity work.fsm port map(divided_clk, showMenu, start_game, shoot_signal and not pause, off_screen, bullet_collision, ai_died, bullet_shot, ai_reset, ai_respawn, ai_tank_hit);
 	
 	--Game objects
 	UserTank : entity work.user_tank port map(divided_clk, enable_move, pixel_row, pixel_col, mouse_x_location, user_location, layers(N_AI_TANK+3));
@@ -219,9 +216,9 @@ begin
 	begin
 		if(rising_edge(divided_clk)) then
 			if (oldvalue /= ai_win) and ai_win = '1' then
-				ded <= '1';
+				ai_died <= '1';
 			else
-				ded <= '0';
+				ai_died <= '0';
 			end if;
 			oldvalue := ai_win;
 		end if;
