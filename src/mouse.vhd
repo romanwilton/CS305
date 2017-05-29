@@ -4,12 +4,12 @@ USE  IEEE.STD_LOGIC_ARITH.all;
 USE  IEEE.STD_LOGIC_UNSIGNED.all;
 
 ENTITY MOUSE IS
-   PORT( clock_25Mhz, reset 			: IN std_logic;
-        SIGNAL mouse_data				: INOUT std_logic;
-        SIGNAL mouse_clk 				: INOUT std_logic;
-        SIGNAL left_button, right_button: OUT std_logic;
-		SIGNAL mouse_cursor_row 		: OUT std_logic_vector(9 DOWNTO 0); 
-		SIGNAL mouse_cursor_column 		: OUT std_logic_vector(9 DOWNTO 0));       	
+   PORT( clock_25Mhz, reset 							: IN std_logic;
+        SIGNAL mouse_data								: INOUT std_logic;
+        SIGNAL mouse_clk 								: INOUT std_logic;
+        SIGNAL left_button, right_button, middle_button : OUT std_logic;
+		SIGNAL mouse_cursor_row 						: OUT std_logic_vector(9 DOWNTO 0); 
+		SIGNAL mouse_cursor_column 						: OUT std_logic_vector(9 DOWNTO 0));       	
 END MOUSE;
 
 ARCHITECTURE behavior OF MOUSE IS
@@ -190,6 +190,7 @@ IF RESET='1' THEN
 	PACKET_COUNT <= "00";
     LEFT_BUTTON <= '0';
     RIGHT_BUTTON <= '0';
+    MIDDLE_BUTTON <= '0';
 	CHARIN <= "00000000";
 ELSIF MOUSE_CLK_FILTER'event and MOUSE_CLK_FILTER='1' THEN
 	IF MOUSE_DATA_DIR='0' THEN
@@ -259,6 +260,7 @@ ELSIF MOUSE_CLK_FILTER'event and MOUSE_CLK_FILTER='1' THEN
 								PACKET_CHAR2(7) & PACKET_CHAR2);
     				LEFT_BUTTON <= PACKET_CHAR1(0);
     				RIGHT_BUTTON <= PACKET_CHAR1(1);
+    				MIDDLE_BUTTON <= PACKET_CHAR1(2);
   				END IF;
 			END IF;
   		END IF;

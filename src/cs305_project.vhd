@@ -58,7 +58,7 @@ architecture arch of cs305_project is
 	signal background : integer range 0 to 6;
 
 	--User input signals
-	signal left_button, right_button, not_bt2, not_bt1 : std_logic;
+	signal left_button, right_button, middle_button, not_bt2, not_bt1 : std_logic;
 	signal start_game, timerReset : std_logic;
 	signal pause : std_logic;
 
@@ -104,10 +104,10 @@ begin
 
 	--Helper blocks
 	ClockDivider : entity work.clock_div port map(clk, divided_clk);
-	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, mouse_y_location, mouse_x_location);
+	MouseController : entity work.MOUSE port map(divided_clk, '0', mouse_data, mouse_clk, left_button, right_button, middle_button, mouse_y_location, mouse_x_location);
 	MouseDebouncer : entity work.debounce port map(divided_clk, left_button, shoot_signal);
 	RandomNumberGen : rand_gen port map(divided_clk, '1', random_pos);
-	PauseController : entity work.pause_toggle port map(divided_clk, not_bt1, showMenu, pause);
+	PauseController : entity work.pause_toggle port map(divided_clk, middle_button, showMenu, pause);
 	
 	--FSMs
 	ControllerFSM : entity work.controller_fsm port map(divided_clk, playClick, trainClick, playerWin, playerDie, left_button, not_bt2, showMenu, trainingMode, level, controllerState);
